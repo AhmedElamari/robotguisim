@@ -153,4 +153,11 @@ public class MyCanvas {
 		gc.strokeLine(d, e, f, g);
 
 	}
+
+	public void setBackgroundColor(char c) {
+		// TODO Auto-generated method stub
+		gc.setFill(colFromChar(c));
+		gc.fillRect(0, 0, xCanvasSize, yCanvasSize);
+
+	}
 }

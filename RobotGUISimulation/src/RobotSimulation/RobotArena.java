@@ -7,6 +7,8 @@ public class RobotArena {
 	protected ArrayList<ArenaItem> items;
 	protected ArrayList<Obstacle> obstacles;
 	protected ArrayList<Robot> robots;
+	protected ArrayList<Light> lights;
+	boolean isBlackOut = false;
 
 	RobotArena() {
 		this(500, 400);
@@ -30,6 +32,11 @@ public class RobotArena {
 	}
 
 	public void drawArena(MyCanvas mc) {
+		if (isBlackOut) {
+			mc.setBackgroundColor('d');
+		} else {
+			mc.setBackgroundColor('w');
+		}
 		for (ArenaItem i : items) {
 			i.drawItem(mc);
 		}
@@ -147,6 +154,13 @@ public class RobotArena {
 		items.add(newObstacle); // Ensure obstacle is added to the items ArrayList
 	}
 
+	public void addLight() {
+		double x = Math.random() * xMax;
+		double y = Math.random() * yMax;
+		Light newLight = new Light(x, y, 10);
+		items.add(newLight); // Ensure light is added to the items ArrayList
+	}
+
 	public boolean canMoveHere(double x, double y, double rad) {
 		for (ArenaItem i : items) {
 			if (i.hitting(x, y, rad)) {
@@ -154,5 +168,9 @@ public class RobotArena {
 			}
 		}
 		return true;
+	}
+
+	public void blackOut() {
+		isBlackOut = !isBlackOut;
 	}
 }

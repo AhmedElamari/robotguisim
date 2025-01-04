@@ -48,13 +48,7 @@ public abstract class ArenaItem {
 		return itemID;
 	}
 
-	public void drawItem(MyCanvas mc) {
-		mc.showCircle(x, y, rad, col);
-	}
-
-	public void showItem(MyCanvas mc) {
-		mc.showCircle(x, y, rad, col);
-	}
+	public abstract void drawItem(MyCanvas mc);
 
 	protected String getStrType() {
 		return "Item";

@@ -112,8 +112,25 @@ public class RobotViewer extends Application {
 				drawWorld();
 			}
 		});
+		Button btnLight = new Button("Add Light");
+		btnLight.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				arena.addLight();
+				drawWorld();
+			}
+		});
+		Button btnBlackOut = new Button("Black Out");
+		btnBlackOut.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				arena.blackOut();
+				drawWorld();
+			}
+		});
 
-		return new HBox(new Label("Control: "), btnStart, btnStop, new Label("Add: "), btnAdd, btnAddObstacle);
+		return new HBox(new Label("Control: "), btnStart, btnStop, new Label("Add: "), btnAdd, btnAddObstacle, btnLight,
+				new Label("Environment: "), btnBlackOut);
 	}
 
 	public void showScore(double x, double y, int score) {
