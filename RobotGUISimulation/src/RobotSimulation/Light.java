@@ -85,4 +85,12 @@ public class Light extends ArenaItem {
 	public void adjustItem() {
 		// Typically nothing if the light is stationary
 	}
+
+	@Override
+	public String toString() {
+		// x and y to 2 decimal places, radius to 1 decimal place
+		return "Light at " + String.format("%.2f", x) + ", " + String.format("%.2f", y) + " with radius "
+				+ String.format("%.1f", rad);
+	}
+
 }

@@ -112,6 +112,14 @@ public class RobotViewer extends Application {
 				drawWorld();
 			}
 		});
+		Button btnWhisker = new Button("Add Whisker");
+		btnWhisker.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				arena.addWhisker();
+				drawWorld();
+			}
+		});
 		Button btnLight = new Button("Add Light");
 		btnLight.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -130,7 +138,7 @@ public class RobotViewer extends Application {
 		});
 
 		return new HBox(new Label("Control: "), btnStart, btnStop, new Label("Add: "), btnAdd, btnAddObstacle, btnLight,
-				new Label("Environment: "), btnBlackOut);
+				btnWhisker, new Label("Environment: "), btnBlackOut);
 	}
 
 	public void showScore(double x, double y, int score) {

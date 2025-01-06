@@ -160,4 +160,18 @@ public class MyCanvas {
 		gc.fillRect(0, 0, xCanvasSize, yCanvasSize);
 
 	}
+
+	public void drawRect(double wheelCornerXRight, double wheelCornerYRight, double wheelWidth, double wheelHeight,
+			char c) {
+		// TODO Auto-generated method stub
+		gc.setFill(colFromChar(c));
+		gc.fillRect(wheelCornerXRight, wheelCornerYRight, wheelWidth, wheelHeight);
+
+	}
+
+	public void setLineWidth(int i) {
+		// TODO Auto-generated method stub
+		gc.setLineWidth(i);
+
+	}
 }

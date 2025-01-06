@@ -17,33 +17,46 @@ public class Robot extends ArenaItem {
 		// Draw the main robot body
 		mc.showCircle(x, y, rad, col);
 
-		// Draw wheels at angles ±45° from the robot's heading (rAngle)
-		// Convert final angles to radians before calling trigonometric functions
+		// Optionally set a thicker line width for drawing the wheels
+		mc.setLineWidth(5);
 
-		// First wheel: rAngle + 45
-		double wheelAx = calcX(rad, rAngle + 45);
-		double wheelAy = calcY(rad, rAngle + 45);
-		mc.showCircle(wheelAx, wheelAy, rad / 4, 'l'); // 'l' for wheel color, adjust as desired (blac)
+		// These two wheels each extend from angle ±45° to angle ±135° relative to the
+		// robot’s heading.
+		// We'll use calcX and calcY to simplify offset calculations.
 
-		// Second wheel: rAngle - 45
-		double wheelBx = calcX(rad, rAngle - 45);
-		double wheelBy = calcY(rad, rAngle - 45);
-		mc.showCircle(wheelBx, wheelBy, rad / 4, 'l');
+		// -------------------------
+		// Right-side wheel
+		// -------------------------
+		// Start point at (rAngle + 45°) from the robot center
+		double startX1 = calcX(rad, rAngle + 45);
+		double startY1 = calcY(rad, rAngle + 45);
+		// End point at (rAngle + 135°) from the robot center
+		double endX1 = calcX(rad, rAngle + 135);
+		double endY1 = calcY(rad, rAngle + 135);
 
-		// Optionally, you can draw additional wheels at ±135° if you’d like a
-		// four-wheel look:
-		double wheelCx = calcX(rad, rAngle + 135);
-		double wheelCy = calcY(rad, rAngle + 135);
-		mc.showCircle(wheelCx, wheelCy, rad / 4, 'l');
+		// Draw the right-side wheel
+		mc.drawLine(startX1, startY1, endX1, endY1);
 
-		double wheelDx = calcX(rad, rAngle - 135);
-		double wheelDy = calcY(rad, rAngle - 135);
-		mc.showCircle(wheelDx, wheelDy, rad / 4, 'l');
+		// -------------------------
+		// Left-side wheel
+		// -------------------------
+		// Start point at (rAngle - 45°) from the robot center
+		double startX2 = calcX(rad, rAngle - 45);
+		double startY2 = calcY(rad, rAngle - 45);
+		// End point at (rAngle - 135°) from the robot center
+		double endX2 = calcX(rad, rAngle - 135);
+		double endY2 = calcY(rad, rAngle - 135);
+
+		// Draw the left-side wheel
+		mc.drawLine(startX2, startY2, endX2, endY2);
+
+		// Reset line width if desired (depends on your MyCanvas implementation)
+		mc.setLineWidth(1);
 	}
 
 	/**
 	 * Helper method to calculate an X coordinate offset by distance s at angle deg
-	 * relative to this robot’s position (x, y) and angle orientation.
+	 * relative to this robot’s position (x, y).
 	 */
 	public double calcX(double s, double deg) {
 		double radians = Math.toRadians(deg);
@@ -52,17 +65,13 @@ public class Robot extends ArenaItem {
 
 	/**
 	 * Helper method to calculate a Y coordinate offset by distance s at angle deg
-	 * relative to this robot’s position (x, y) and angle orientation.
+	 * relative to this robot’s position (x, y).
 	 */
 	public double calcY(double s, double deg) {
 		double radians = Math.toRadians(deg);
 		return y + s * Math.sin(radians);
 	}
 
-	/**
-	 * Check collisions with obstacles, other robots, and also re-check angle if
-	 * near boundaries by calling CheckRobotAngle.
-	 */
 	@Override
 	public void checkItem(RobotArena r) {
 		// Check obstacle collisions
@@ -88,11 +97,7 @@ public class Robot extends ArenaItem {
 		rAngle = r.CheckRobotAngle(x, y, rad, rAngle, itemID);
 	}
 
-	/**
-	 * A possible approach: each time the robot moves, apply a small chance that its
-	 * direction will randomly adjust by a few degrees. This makes it move somewhat
-	 * unpredictably even after bouncing off walls.
-	 */
+	@Override
 	public void adjustItem() {
 		// Convert the current angle to radians for basic movement
 		double radAngle = Math.toRadians(rAngle);
@@ -102,21 +107,12 @@ public class Robot extends ArenaItem {
 		y += rSpeed * Math.sin(radAngle);
 
 		// Introduce a small chance to change direction randomly
-		double changeProbability = 0.05; // 5% chance on each move (adjust as desired)
+		double changeProbability = 0.05; // 5% chance on each move
 		if (Math.random() < changeProbability) {
 			// Random offset between -20 and +20 degrees
 			double randomOffset = (Math.random() * 40) - 20;
 			rAngle = (rAngle + randomOffset) % 360;
 		}
-
-		// You can also insert a boundary check here to detect wall collisions
-		// and then add a random offset to rAngle when it bounces.
-		// Example:
-		// if (x - rad < 0 || x + rad > arena.getXSize()
-		// || y - rad < 0 || y + rad > arena.getYSize()) {
-		// double collisionOffset = (Math.random() * 40) - 20;
-		// rAngle = (rAngle + 180 + collisionOffset) % 360;
-		// }
 	}
 
 	@Override
@@ -125,13 +121,10 @@ public class Robot extends ArenaItem {
 	}
 
 	public void setAngle(double newAngle) {
-		// TODO Auto-generated method stub
 		rAngle = newAngle;
-
 	}
 
 	public double getAngle() {
-		// TODO Auto-generated method stub
 		return rAngle;
 	}
 }

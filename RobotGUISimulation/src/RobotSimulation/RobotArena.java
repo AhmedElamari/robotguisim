@@ -8,6 +8,7 @@ public class RobotArena {
 	protected ArrayList<Obstacle> obstacles;
 	protected ArrayList<Robot> robots;
 	protected ArrayList<Light> lights;
+	protected ArrayList<Whisker> whiskers;
 	boolean isBlackOut = false;
 
 	RobotArena() {
@@ -19,8 +20,7 @@ public class RobotArena {
 		yMax = yS;
 		items = new ArrayList<ArenaItem>();
 		// Example initial robot
-		items.add(new Robot(xS / 2, yS / 2, 10, 45, 2, this));
-		items.add(new Obstacle(xS / 3, yS / 3, 10));
+		items.add(new Whisker(100, 100, 10, 45, 1, this));
 	}
 
 	public double getXSize() {
@@ -159,6 +159,13 @@ public class RobotArena {
 		double y = Math.random() * yMax;
 		Light newLight = new Light(x, y, 10);
 		items.add(newLight); // Ensure light is added to the items ArrayList
+	}
+
+	public void addWhisker() {
+		double x = Math.random() * xMax;
+		double y = Math.random() * yMax;
+		Whisker newWhisker = new Whisker(x, y, 10, 45, 1, this);
+		items.add(newWhisker); // Ensure whisker is added to the items ArrayList
 	}
 
 	public boolean canMoveHere(double x, double y, double rad) {
