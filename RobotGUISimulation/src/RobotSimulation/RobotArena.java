@@ -9,6 +9,7 @@ public class RobotArena {
 	protected ArrayList<Robot> robots; // List of robots in the arena
 	protected ArrayList<Light> lights; // List of lights in the arena
 	protected ArrayList<Whisker> whiskers; // List of whiskers in the arena
+	protected ArrayList<Beam> beams; // List of beams in the arena
 	boolean isBlackOut = false; // Indicates if the arena lights are out
 
 	// Default constructor initializes the arena with predefined dimensions
@@ -22,7 +23,7 @@ public class RobotArena {
 		yMax = yS;
 		items = new ArrayList<ArenaItem>();
 		// Example initial robot
-		items.add(new Whisker(100, 100, 10, 45, 1, this));
+		items.add(new Beam(100, 100, 10, 45, 1, this));
 	}
 
 	public double getXSize() {
