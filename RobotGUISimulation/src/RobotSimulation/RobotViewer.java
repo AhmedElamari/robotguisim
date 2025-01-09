@@ -24,6 +24,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * This class is the main class that runs the robot simulation. It creates the
+ * GUI
+ */
 public class RobotViewer extends Application {
 	private MyCanvas mc;
 	private AnimationTimer timer;
@@ -56,15 +60,23 @@ public class RobotViewer extends Application {
 	MenuBar setMenu() {
 		MenuBar menuBar = new MenuBar();
 		Menu mFile = new Menu("File");
-		MenuItem exit = new MenuItem("Exit");
-		exit.setOnAction(new EventHandler<ActionEvent>() {
+		MenuItem mNew = new MenuItem("New");
+		mNew.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				arena = new RobotArena(400, 500);
+				drawWorld();
+			}
+		});
+		MenuItem mExit = new MenuItem("Exit");
+		mExit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent t) {
 				timer.stop();
 				System.exit(0);
 			}
 		});
-		mFile.getItems().addAll(exit);
+		mFile.getItems().addAll(mNew, mExit);
 
 		Menu mHelp = new Menu("Help");
 		MenuItem mAbout = new MenuItem("About");

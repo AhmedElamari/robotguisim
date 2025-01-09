@@ -1,15 +1,16 @@
+// Java class for the Robot object, which extends ArenaItem and represents a robot within the arena.
 package RobotSimulation;
 
 public class Robot extends ArenaItem {
-	RobotArena arena;
-	double rAngle, rSpeed;
+	RobotArena arena; // Reference to the arena where the robot operates
+	double rAngle, rSpeed; // Angle of rotation and speed of the robot
 
 	public Robot(double ix, double iy, double ir, double ia, double is, RobotArena arena) {
-		super(ix, iy, ir);
-		this.arena = arena;
-		col = 'r';
-		rAngle = ia;
-		rSpeed = is;
+		super(ix, iy, ir); // Initialize the parent class with position and radius
+		this.arena = arena; // Assign the arena to the robot
+		col = 'r'; // Set the color representation of the robot
+		rAngle = ia; // Initialize the rotation angle
+		rSpeed = is; // Initialize the speed
 	}
 
 	@Override
@@ -117,14 +118,17 @@ public class Robot extends ArenaItem {
 
 	@Override
 	protected String getStrType() {
+		// Returns the type of the object as a string
 		return "Robot";
 	}
 
 	public void setAngle(double newAngle) {
+		// Sets the angle of the robot to the specified new angle
 		rAngle = newAngle;
 	}
 
 	public double getAngle() {
+		// Returns the current angle of the robot
 		return rAngle;
 	}
 }
