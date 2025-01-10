@@ -17,7 +17,7 @@ public class Beam extends Robot {
 	private double beamSpread = 45.0; // Total angular spread of the beam in degrees
 	private int arcSegments = 15; // Number of segments to approximate the top arc
 
-	private ArrayList<double[]> beamPoints; // Stores points along the arc for detection
+	protected ArrayList<double[]> beamPoints; // Stores points along the arc for detection
 
 	public Beam(double ix, double iy, double ir, double ia, double is, RobotArena arena) {
 		super(ix, iy, ir, ia, is, arena);
@@ -145,7 +145,7 @@ public class Beam extends Robot {
 	/**
 	 * Calculate angle from this robot's position (x,y) to a target (tx, ty).
 	 */
-	private double angleToPoint(double tx, double ty) {
+	protected double angleToPoint(double tx, double ty) {
 		double dx = tx - x;
 		double dy = ty - y;
 		double radians = Math.atan2(dy, dx);
@@ -155,7 +155,7 @@ public class Beam extends Robot {
 	/**
 	 * Utility to measure distance between two points.
 	 */
-	private double distance(double x1, double y1, double x2, double y2) {
+	protected double distance(double x1, double y1, double x2, double y2) {
 		return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 	}
 

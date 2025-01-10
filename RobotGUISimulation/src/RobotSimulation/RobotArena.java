@@ -23,7 +23,7 @@ public class RobotArena {
 		yMax = yS;
 		items = new ArrayList<ArenaItem>();
 		// Example initial robot
-		items.add(new Beam(100, 100, 10, 45, 1, this));
+		items.add(new BeamLight(200, 200, 10, 45, 2, this));
 	}
 
 	public double getXSize() {
