@@ -131,4 +131,11 @@ public class Robot extends ArenaItem {
 		// Returns the current angle of the robot
 		return rAngle;
 	}
+
+	@Override
+	public String fileString() {
+		// Appends "Robot" plus angle and speed fields
+		// e.g., "Beam Robot 95.76 146.85 10.0 y -152.98 0.0"
+		return getStrType() + x + " " + y + " " + rad + " " + col + " " + rAngle + " " + rSpeed;
+	}
 }

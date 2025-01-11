@@ -1,7 +1,5 @@
 package RobotSimulation;
 
-import java.util.ArrayList;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -33,6 +31,7 @@ public class RobotViewer extends Application {
 	private AnimationTimer timer;
 	private VBox rtPane;
 	private RobotArena arena;
+	private TextFile tf = new TextFile("Text Files", "txt");
 
 	private void showAbout() {
 		Alert alert = new Alert(AlertType.INFORMATION);
@@ -68,6 +67,21 @@ public class RobotViewer extends Application {
 				drawWorld();
 			}
 		});
+		MenuItem mSave = new MenuItem("Save");
+		mSave.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				Save();
+			}
+		});
+		MenuItem mLoad = new MenuItem("Load");
+		mLoad.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent actionEvent) {
+				Load();
+				drawWorld();
+			}
+		});
 		MenuItem mExit = new MenuItem("Exit");
 		mExit.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
@@ -76,7 +90,7 @@ public class RobotViewer extends Application {
 				System.exit(0);
 			}
 		});
-		mFile.getItems().addAll(mNew, mExit);
+		mFile.getItems().addAll(mNew, mSave, mLoad, mExit);
 
 		Menu mHelp = new Menu("Help");
 		MenuItem mAbout = new MenuItem("About");
@@ -162,11 +176,34 @@ public class RobotViewer extends Application {
 		arena.drawArena(mc);
 	}
 
-	public void drawStatus() {
-		rtPane.getChildren().clear();
-		ArrayList<String> allRs = arena.describeAll();
-		for (String s : allRs) {
-			rtPane.getChildren().add(new Label(s));
+	public void Save() {
+		if (tf.createFile()) { // Try creating/opening the file
+			tf.writeAllFile(arena.filestring()); // Write the Arena data
+		} else {
+			System.out.println("No write file selected");
+		}
+	}
+
+	public void Load() {
+		try {
+			if (tf.openFile()) {
+				System.out.println("Reading from " + tf.usedFileName());
+				// Read entire file as a String
+				String fs = tf.readAllFile();
+
+				// Safely remove any trailing whitespace or newline characters,
+				// but keep semicolons or other data intact
+				fs = fs.trim();
+
+				// Debug: print content if needed
+				// System.out.println("File content: " + fs);
+
+				arena = new RobotArena(fs);
+				drawWorld();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("No read file selected");
 		}
 	}
 

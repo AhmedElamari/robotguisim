@@ -75,4 +75,9 @@ public class Obstacle extends ArenaItem {
 		x = x2;
 		y = y2;
 	}
+
+	@Override
+	public String fileString() {
+		return "Obstacle " + x + " " + y + " " + rad + " " + col;
+	}
 }

@@ -93,4 +93,10 @@ public class Light extends ArenaItem {
 				+ String.format("%.1f", rad);
 	}
 
+	@Override
+	public String fileString() {
+		// Example: "Light 100.0 200.0 10.0 y"
+		return "Light " + x + " " + y + " " + rad + " " + col;
+	}
+
 }

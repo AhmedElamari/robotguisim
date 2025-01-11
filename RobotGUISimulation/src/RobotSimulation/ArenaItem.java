@@ -79,4 +79,6 @@ public abstract class ArenaItem {
 		return y + s * Math.sin(Math.toRadians(a));
 	}
 
+	public abstract String fileString();
+
 }

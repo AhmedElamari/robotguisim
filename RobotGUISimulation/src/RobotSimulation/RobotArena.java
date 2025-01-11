@@ -26,6 +26,96 @@ public class RobotArena {
 		items.add(new BeamLight(200, 200, 10, 45, 2, this));
 	}
 
+	// This constructor can parse saved data to rebuild the arena
+	RobotArena(String savedData) {
+		items = new ArrayList<>();
+		StringSplitter mainSplit = new StringSplitter(savedData, ";");
+
+		// The first element should contain the arena dimensions
+		String dimStr = mainSplit.getNth(0, "");
+		if (!dimStr.isEmpty()) {
+			StringSplitter dimSplit = new StringSplitter(dimStr, " ");
+			xMax = dimSplit.getNthInt(0, 500);
+			yMax = dimSplit.getNthInt(1, 400);
+		} else {
+			xMax = 500;
+			yMax = 400;
+		}
+
+		// Parse each subsequent element to reconstruct items
+		for (int i = 1; i < mainSplit.numElement(); i++) {
+			String itemStr = mainSplit.getNth(i, "").trim();
+			if (itemStr.isEmpty()) {
+				continue;
+			}
+
+			// Split item string by space
+			StringSplitter itemSplit = new StringSplitter(itemStr, " ");
+			String itemType = itemSplit.getNth(0, "");
+
+			// For example:
+			// "Robot 95.76 146.85 10.0 y -152.98 0.0"
+			if (itemType.equalsIgnoreCase("Robot")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				char col = itemSplit.getNth(4, "y").charAt(0);
+				double angle = Double.parseDouble(itemSplit.getNth(5, "0"));
+				double speed = Double.parseDouble(itemSplit.getNth(6, "1"));
+				Robot newRobot = new Robot(x, y, r, angle, speed, this);
+				newRobot.col = col; // If you track color separately in Robot
+				items.add(newRobot);
+
+			} else if (itemType.equalsIgnoreCase("Obstacle")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				char col = itemSplit.getNth(4, "b").charAt(0);
+				Obstacle obs = new Obstacle(x, y, r);
+				obs.col = col; // If needed
+				items.add(obs);
+
+			} else if (itemType.equalsIgnoreCase("Light")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				char col = itemSplit.getNth(4, "w").charAt(0);
+				Light l = new Light(x, y, r);
+				l.col = col; // If needed
+				items.add(l);
+
+			} else if (itemType.equalsIgnoreCase("Whisker")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				double angle = Double.parseDouble(itemSplit.getNth(4, "0"));
+				double speed = Double.parseDouble(itemSplit.getNth(5, "1"));
+				Whisker w = new Whisker(x, y, r, angle, speed, this);
+				items.add(w);
+
+			} else if (itemType.equalsIgnoreCase("Beam Robot")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				double angle = Double.parseDouble(itemSplit.getNth(4, "0"));
+				double speed = Double.parseDouble(itemSplit.getNth(5, "1"));
+				Beam b = new Beam(x, y, r, angle, speed, this);
+				items.add(b);
+
+			} else if (itemType.equalsIgnoreCase("BeamLight")) {
+				double x = Double.parseDouble(itemSplit.getNth(1, "0"));
+				double y = Double.parseDouble(itemSplit.getNth(2, "0"));
+				double r = Double.parseDouble(itemSplit.getNth(3, "10"));
+				double angle = Double.parseDouble(itemSplit.getNth(4, "0"));
+				double speed = Double.parseDouble(itemSplit.getNth(5, "1"));
+				BeamLight bl = new BeamLight(x, y, r, angle, speed, this);
+				items.add(bl);
+
+			}
+
+		}
+	}
+
 	public double getXSize() {
 		return xMax; // Returns the width of the arena
 	}
@@ -202,5 +292,22 @@ public class RobotArena {
 	// Toggles the blackout state of the arena
 	public void blackOut() {
 		isBlackOut = !isBlackOut; // Switch blackout state
+	}
+
+	// Filestring method for saving the arena and its items
+	public String filestring() {
+		// First, save the dimensions
+		StringBuilder sb = new StringBuilder();
+		sb.append(xMax).append(" ").append(yMax).append(";");
+
+		// Append each item's data
+		for (ArenaItem item : items) {
+			/*
+			 * Each item has its own fileString() now. For example, Robot:
+			 * "Robot 95.76 146.85 10.0 y -152.98 0.0"
+			 */
+			sb.append(item.fileString()).append(";");
+		}
+		return sb.toString();
 	}
 }
