@@ -52,8 +52,9 @@ public class RobotArena {
 				try {
 					xMax = Double.parseDouble(dims[0]);
 					yMax = Double.parseDouble(dims[1]);
+					System.out.println("Arena dimensions: " + xMax + " x " + yMax);
 				} catch (NumberFormatException e) {
-					xMax = 500; // Default values if parsing fails
+					xMax = 500;
 					yMax = 400;
 				}
 			}
@@ -81,6 +82,46 @@ public class RobotArena {
 							Robot r = new Robot(x, y, rad, angle, speed, this);
 							r.col = col;
 							items.add(r);
+							System.out.println("Added Robot");
+						}
+						break;
+
+					case "Whisker":
+						if (parts.length >= 7) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+							double angle = Double.parseDouble(parts[5]);
+							double speed = Double.parseDouble(parts[6]);
+							Whisker w = new Whisker(x, y, rad, angle, speed, this);
+							w.col = col;
+							items.add(w);
+							System.out.println("Added Whisker");
+						}
+						break;
+
+					case "Beam":
+						if (parts.length >= 8) {
+							String type = parts[1]; // Should be "Robot" or "Light"
+							double x = Double.parseDouble(parts[2]);
+							double y = Double.parseDouble(parts[3]);
+							double rad = Double.parseDouble(parts[4]);
+							char col = parts[5].charAt(0);
+							double angle = Double.parseDouble(parts[6]);
+							double speed = Double.parseDouble(parts[7]);
+
+							if (type.equals("Light")) {
+								BeamLight bl = new BeamLight(x, y, rad, angle, speed, this);
+								bl.col = col;
+								items.add(bl);
+								System.out.println("Added Beam Light");
+							} else if (type.equals("Robot")) {
+								Beam b = new Beam(x, y, rad, angle, speed, this);
+								b.col = col;
+								items.add(b);
+								System.out.println("Added Beam Robot");
+							}
 						}
 						break;
 
@@ -93,6 +134,7 @@ public class RobotArena {
 							Light l = new Light(x, y, rad);
 							l.col = col;
 							items.add(l);
+							System.out.println("Added Light");
 						}
 						break;
 
@@ -105,27 +147,16 @@ public class RobotArena {
 							Obstacle o = new Obstacle(x, y, rad);
 							o.col = col;
 							items.add(o);
-						}
-						break;
-
-					case "Beam":
-						if (parts.length >= 8 && parts[1].equals("Robot")) {
-							double x = Double.parseDouble(parts[2]);
-							double y = Double.parseDouble(parts[3]);
-							double rad = Double.parseDouble(parts[4]);
-							char col = parts[5].charAt(0);
-							double angle = Double.parseDouble(parts[6]);
-							double speed = Double.parseDouble(parts[7]);
-							Beam b = new Beam(x, y, rad, angle, speed, this);
-							b.col = col;
-							items.add(b);
+							System.out.println("Added Obstacle");
 						}
 						break;
 					}
 				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 					System.out.println("Error parsing line: " + line);
+					e.printStackTrace();
 				}
 			}
+			System.out.println("Total items loaded: " + items.size());
 		}
 	}
 

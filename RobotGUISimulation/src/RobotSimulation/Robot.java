@@ -134,8 +134,6 @@ public class Robot extends ArenaItem {
 
 	@Override
 	public String fileString() {
-		// Appends "Robot" plus angle and speed fields
-		// e.g., "Beam Robot 95.76 146.85 10.0 y -152.98 0.0"
-		return getStrType() + x + " " + y + " " + rad + " " + col + " " + rAngle + " " + rSpeed;
+		return String.format("Robot %.1f %.1f %.1f %c %.1f %.1f", x, y, rad, col, rAngle, rSpeed);
 	}
 }

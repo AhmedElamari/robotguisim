@@ -163,4 +163,10 @@ public class Beam extends Robot {
 	protected String getStrType() {
 		return "Beam Robot";
 	}
+
+	@Override
+	public String fileString() {
+		// Make sure there are spaces between all values
+		return String.format("Beam Robot %f %f %f %c %f %f", x, y, rad, col, rAngle, rSpeed);
+	}
 }

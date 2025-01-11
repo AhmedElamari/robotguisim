@@ -331,4 +331,9 @@ public class Whisker extends Robot {
 			return true;
 		return false;
 	}
+
+	@Override
+	public String fileString() {
+		return String.format("Whisker %.1f %.1f %.1f %c %.1f %.1f", x, y, rad, col, rAngle, rSpeed);
+	}
 }
