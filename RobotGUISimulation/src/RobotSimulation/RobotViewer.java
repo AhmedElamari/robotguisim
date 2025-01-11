@@ -1,5 +1,7 @@
 package RobotSimulation;
 
+import java.util.ArrayList;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -171,40 +173,62 @@ public class RobotViewer extends Application {
 		mc.showText(x, y, Integer.toString(score));
 	}
 
-	public void drawWorld() {
-		mc.clearCanvas();
-		arena.drawArena(mc);
+	public void drawStatus() {
+		rtPane.getChildren().clear();
+		ArrayList<String> alrRs = arena.describeAll();
+		for (String s : alrRs) {
+			rtPane.getChildren().add(new Label(s));
+		}
 	}
 
 	public void Save() {
-		if (tf.createFile()) { // Try creating/opening the file
-			tf.writeAllFile(arena.filestring()); // Write the Arena data
+		if (tf.createFile()) { // This opens a save dialog and creates the file
+			String arenaData = arena.filestring(); // Get the arena data as a string
+			tf.writeAllFile(arenaData); // Write the data to the file
+			System.out.println("Saved to: " + tf.usedFileName());
 		} else {
-			System.out.println("No write file selected");
+			System.out.println("Save operation cancelled");
+			// Optionally show an alert to the user
+			Alert alert = new Alert(AlertType.WARNING);
+			alert.setTitle("Save Failed");
+			alert.setHeaderText(null);
+			alert.setContentText("Failed to save the simulation.");
+			alert.showAndWait();
 		}
 	}
 
 	public void Load() {
 		try {
-			if (tf.openFile()) {
-				System.out.println("Reading from " + tf.usedFileName());
-				// Read entire file as a String
-				String fs = tf.readAllFile();
+			if (tf.openFile()) { // This opens a file chooser dialog
+				System.out.println("Reading from: " + tf.usedFileName());
+				String fileContent = tf.readAllFile(); // Read the entire file
 
-				// Safely remove any trailing whitespace or newline characters,
-				// but keep semicolons or other data intact
-				fs = fs.trim();
-
-				// Debug: print content if needed
-				// System.out.println("File content: " + fs);
-
-				arena = new RobotArena(fs);
-				drawWorld();
+				// Create new arena from the loaded data
+				arena = new RobotArena(fileContent);
+				drawWorld(); // Redraw the world with loaded data
+			} else {
+				System.out.println("Load operation cancelled");
+				// Optionally show an alert to the user
+				Alert alert = new Alert(AlertType.WARNING);
+				alert.setTitle("Load Failed");
+				alert.setHeaderText(null);
+				alert.setContentText("Failed to load the simulation.");
+				alert.showAndWait();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.out.println("No read file selected");
+			// Show error alert
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Error");
+			alert.setHeaderText("Load Error");
+			alert.setContentText("An error occurred while loading: " + e.getMessage());
+			alert.showAndWait();
 		}
+	}
+
+	public void drawWorld() {
+		mc.clearCanvas();
+		arena.drawArena(mc);
 	}
 
 	@Override
@@ -230,7 +254,7 @@ public class RobotViewer extends Application {
 				arena.checkItems(); // check the angle of all balls
 				arena.adjustItems(); // move all balls
 				drawWorld(); // redraw the world
-				drawStatus(); // indicate where balls are
+				drawStatus(); // indicate where robots are
 			}
 		};
 
