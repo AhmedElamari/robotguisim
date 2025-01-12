@@ -23,7 +23,11 @@ public class RobotArena {
 		yMax = yS;
 		items = new ArrayList<ArenaItem>();
 		// Example initial robot
-		items.add(new BeamLight(200, 200, 10, 45, 2, this));
+		items.add(new PredatorRobot(300, 300, 10, 45, 2, this));
+		items.add(new Prey(200, 200, 10, 45, 2, this));
+		items.add(new Prey(200, 200, 10, 45, 2, this));
+		items.add(new Prey(200, 200, 10, 45, 2, this));
+		items.add(new Prey(200, 200, 10, 45, 2, this));
 	}
 
 	public String filestring() {
@@ -150,6 +154,35 @@ public class RobotArena {
 							System.out.println("Added Obstacle");
 						}
 						break;
+					case "Prey":
+						if (parts.length >= 7) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+							double angle = Double.parseDouble(parts[5]);
+							double speed = Double.parseDouble(parts[6]);
+							Prey p = new Prey(x, y, rad, angle, speed, this);
+							p.col = col;
+							items.add(p);
+							System.out.println("Added Prey");
+						}
+						break;
+					case "Predator":
+						if (parts.length >= 7) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+							double angle = Double.parseDouble(parts[5]);
+							double speed = Double.parseDouble(parts[6]);
+							int preyeaten = Integer.parseInt(parts[7]);
+							PredatorRobot pr = new PredatorRobot(x, y, rad, angle, speed, this);
+							pr.col = col;
+							items.add(pr);
+							System.out.println("Added Predator");
+						}
+						break;
 					}
 				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 					System.out.println("Error parsing line: " + line);
@@ -182,8 +215,25 @@ public class RobotArena {
 
 	// Checks the state of all items in the arena
 	public void checkItems() {
+		// Create a list to store items that need to be removed
+		ArrayList<ArenaItem> itemsToRemove = new ArrayList<>();
+
+		// First pass: check items and mark for removal
 		for (ArenaItem i : items) {
-			i.checkItem(this); // Check each item for updates or interactions
+			i.checkItem(this);
+			// If an item needs to be removed, add it to the removal list
+			if (i instanceof Prey && ((Prey) i).isBeingEaten()) {
+				itemsToRemove.add(i);
+			}
+		}
+
+		// Second pass: remove marked items
+		items.removeAll(itemsToRemove);
+	}
+
+	public void removePrey(ArenaItem prey) {
+		if (prey instanceof Prey) {
+			((Prey) prey).beingEaten();
 		}
 	}
 
