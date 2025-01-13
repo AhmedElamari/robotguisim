@@ -13,9 +13,9 @@ import java.util.ArrayList;
  * movement randomness to avoid leaning too heavily to one side.
  */
 public class Beam extends Robot {
-	private double beamRadius = 60.0; // Overall length of the beam
-	private double beamSpread = 45.0; // Total angular spread of the beam in degrees
-	private int arcSegments = 15; // Number of segments to approximate the top arc
+	protected double beamRadius = 60.0; // Overall length of the beam
+	protected double beamSpread = 45.0; // Total angular spread of the beam in degrees
+	protected int arcSegments = 15; // Number of segments to approximate the top arc
 
 	protected ArrayList<double[]> beamPoints; // Stores points along the arc for detection
 
@@ -68,6 +68,13 @@ public class Beam extends Robot {
 			startArcY = nextArcY;
 			currentAngle = nextAngle;
 		}
+
+		// Close the polygon by adding the final points
+		beamPoints.add(new double[] { rightX, rightY });
+		beamPoints.add(new double[] { x, y });
+
+		// Fill the polygon
+		mc.fillPolygon(beamPoints, col);
 	}
 
 	/**

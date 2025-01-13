@@ -1,5 +1,7 @@
 package RobotSimulation;
 
+import java.util.ArrayList;
+
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -174,4 +176,21 @@ public class MyCanvas {
 		gc.setLineWidth(i);
 
 	}
+
+	public void setStrokeColour(char c) {
+		gc.setStroke(colFromChar(c));
+	}
+
+	public void fillPolygon(ArrayList<double[]> beamPoints, char col) {
+		setFillColour(colFromChar(col));
+		double[] xpoints = new double[beamPoints.size()];
+		double[] ypoints = new double[beamPoints.size()];
+
+		for (int i = 0; i < beamPoints.size(); i++) {
+			xpoints[i] = beamPoints.get(i)[0];
+			ypoints[i] = beamPoints.get(i)[1];
+		}
+		gc.fillPolygon(xpoints, ypoints, beamPoints.size());
+	}
+
 }

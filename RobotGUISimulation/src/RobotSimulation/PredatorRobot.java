@@ -29,9 +29,13 @@ public class PredatorRobot extends Beam {
 	private int preyEaten = 0;
 	private static final double EATING_DISTANCE = 5.0; // Distance threshold for eating prey
 
+	private boolean isDetecting = false; // New flag to track detection
+
 	public PredatorRobot(double ix, double iy, double ir, double ia, double is, RobotArena arena) {
 		super(ix, iy, ir, ia, is, arena);
 		col = 'r'; // Color representation for Predator
+		this.beamRadius = 80.0; // Increase beam radius for wider detection
+		this.beamSpread = 60.0; // Increase beam angular spread for a wider look
 	}
 
 	/**
@@ -43,6 +47,18 @@ public class PredatorRobot extends Beam {
 	@Override
 	public void checkItem(RobotArena r) {
 		super.checkItem(r);
+		isDetecting = false; // Reset detection flag
+
+		for (double[] pt : beamPoints) {
+			for (ArenaItem item : r.items) {
+				if (item != this) {
+					double dist = distance(pt[0], pt[1], item.getX(), item.getY());
+					if (dist < item.getRad() + DETECTION_BUFFER) {
+						isDetecting = true; // Set detection flag
+					}
+				}
+			}
+		}
 
 		// Check if we can eat currently tracked prey
 		if (isChasing && trackedPrey != null) {
@@ -183,21 +199,25 @@ public class PredatorRobot extends Beam {
 	 */
 	@Override
 	public void drawItem(MyCanvas mc) {
+		char originalColor = col; // Save the original color
+
+		if (isDetecting) {
+			col = 'g'; // Change to green if detecting
+		}
+
 		// Draw eating animation when applicable
 		if (isEating) {
-			// Flash effect when eating
-			char originalColor = col;
-			col = 'o'; // Orange flash
-			mc.showCircle(x, y, rad * 1.2, col); // Larger circle when eating
-			col = originalColor;
+			char eatingColor = 'o'; // Orange flash
+			mc.showCircle(x, y, rad * 1.2, eatingColor); // Larger circle when eating
 			isEating = false; // Reset eating state
 		} else {
-			// Normal drawing
 			super.drawItem(mc);
 			if (isChasing && trackedPrey != null) {
 				mc.drawLine(x, y, trackedPrey.x, trackedPrey.y);
 			}
 		}
+
+		col = originalColor; // Revert to the original color
 	}
 
 	/**
@@ -225,15 +245,20 @@ public class PredatorRobot extends Beam {
 	 * Perform a roar that affects nearby Prey. This can reduce speed or trigger
 	 * another effect.
 	 */
+
 	private void performRoar(RobotArena r) {
-		double roarRange = 100.0; // Radius of impact
+		final double ROAR_RANGE = 100.0; // Radius of impact
 		for (ArenaItem item : r.items) {
-			if (item instanceof Prey) {
-				double dist = distance(x, y, item.getX(), item.getY());
-				/*
-				 * if (dist < roarRange) { Prey p = (Prey) item; p.rSpeed = Math.max(p.rSpeed *
-				 * 0.5, 0.5);
-				 */
+			if (item instanceof Prey prey) {
+				double dist = distance(x, y, prey.getX(), prey.getY());
+				if (dist <= ROAR_RANGE) {
+					// slow down prey speed
+					if (dist < ROAR_RANGE) {
+						Prey p = (Prey) item;
+						p.rSpeed = Math.max(p.rSpeed * 0.5, 0.5);
+					}
+
+				}
 			}
 		}
 	}

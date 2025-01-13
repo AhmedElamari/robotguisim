@@ -27,7 +27,7 @@ public class RobotArena {
 		items.add(new Prey(200, 200, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
-		items.add(new Prey(200, 200, 10, 45, 2, this));
+
 	}
 
 	public String filestring() {
