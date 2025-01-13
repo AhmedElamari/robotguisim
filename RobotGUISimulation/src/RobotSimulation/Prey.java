@@ -119,10 +119,7 @@ public class Prey extends Robot {
 			rAngle = (rAngle + randomOffset) % 360;
 		}
 
-		// Standard Robot movement
-		double radAngle = Math.toRadians(rAngle);
-		x += rSpeed * Math.cos(radAngle);
-		y += rSpeed * Math.sin(radAngle);
+		super.adjustItem();
 	}
 
 	/**
