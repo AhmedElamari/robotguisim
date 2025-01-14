@@ -276,6 +276,33 @@ public class RobotArena {
 		items.add(newRobot); // Add the new robot to the items list
 	}
 
+	public Robot getRoboAt(double x, double y) {
+		for (ArenaItem item : items) {
+			if (item instanceof Robot) {
+				Robot r = (Robot) item;
+				double dist = distanceBetween(x, y, r.getX(), r.getY());
+				if (dist <= r.getRad()) {
+					return r; // Return the robot if it is at the specified position
+				}
+			}
+		}
+		return null; // Return null if no robot is found at the specified position
+	}
+
+	/**
+	 * calculates the distance between two points in the arena (operation for
+	 * getrobo)
+	 * 
+	 * @param x
+	 * @param y
+	 * @param x2
+	 * @param y2
+	 * @return
+	 */
+	private double distanceBetween(double x, double y, double x2, double y2) {
+		return Math.sqrt(Math.pow(x - x2, 2) + Math.pow(y - y2, 2));
+	}
+
 	/**
 	 * Modified to randomize the angle of the robot's bounce when colliding with a
 	 * wall or another item.
@@ -394,6 +421,11 @@ public class RobotArena {
 				((Robot) item).toggleWheelColor(isBlackOut);
 			}
 		}
+	}
+
+	public void removeRobot(Robot robot) {
+		items.remove(robot);
+
 	}
 
 }

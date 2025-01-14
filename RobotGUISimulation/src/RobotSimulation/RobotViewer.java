@@ -7,7 +7,6 @@ import javafx.animation.FadeTransition;
 import javafx.application.Application;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
@@ -16,12 +15,14 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -37,6 +38,7 @@ public class RobotViewer extends Application {
 	private ScrollPane rtScroll; // Wraps rtPane for scrolling
 	private RobotArena arena;
 	private TextFile tf = new TextFile("Text Files", "txt");
+	private Robot selectedRobot = null; // Example selected robot for data binding
 
 	// Example score property to demonstrate data binding
 	private IntegerProperty scoreProperty = new SimpleIntegerProperty(0);
@@ -56,14 +58,58 @@ public class RobotViewer extends Application {
 	 * When the mouse is pressed on the Canvas, set the robot to that location.
 	 */
 	void setMouseEvents(Canvas canvas) {
-		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-			@Override
-			public void handle(MouseEvent e) {
-				arena.setRobot(e.getX(), e.getY());
+		// Handle mouse press
+		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+			// Check if right-click
+			if (e.getButton() == MouseButton.SECONDARY) {
+				Robot clickedRobot = arena.getRoboAt(e.getX(), e.getY());
+				if (clickedRobot != null) {
+					// Show context menu for the clicked robot
+					ContextMenu contextMenu = createRobotContextMenu(clickedRobot);
+					contextMenu.show(canvas, e.getScreenX(), e.getScreenY());
+					selectedRobot = clickedRobot;
+				} else {
+					// If right-click on empty space, clear selection
+					selectedRobot = null;
+				}
 				drawWorld();
 				drawStatus();
 			}
+			// if mouse pressed all robots go there
+			else if (e.getButton() == MouseButton.PRIMARY) {
+				arena.setRobot(e.getX(), e.getY());
+				drawWorld();
+			}
 		});
+
+		// Handle dragging (typically left-button drag)
+		canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
+			// Example: move the selected robot with left-drag
+			if (selectedRobot != null && e.getButton() == MouseButton.PRIMARY) {
+				selectedRobot.setXY(e.getX(), e.getY());
+				drawWorld();
+			}
+		});
+	}
+
+	/**
+	 * Create a context menu for the robot.
+	 */
+	private ContextMenu createRobotContextMenu(Robot robot) {
+		ContextMenu menu = new ContextMenu();
+		MenuItem selectItem = new MenuItem("Select");
+		selectItem.setOnAction(e -> {
+			selectedRobot = robot;
+			drawWorld();
+		});
+		MenuItem deleteItem = new MenuItem("Delete");
+		deleteItem.setOnAction(e -> {
+			arena.removeRobot(robot);
+			drawWorld();
+			drawStatus();
+		});
+		menu.getItems().addAll(selectItem, deleteItem);
+		return menu;
 	}
 
 	/**
