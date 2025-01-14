@@ -26,6 +26,7 @@ public class Whisker extends Robot {
 	private double originalSpeed; // Remember initial speed
 	private boolean isSpeedBoosted; // Keep track if we are in "panic-mode" speed
 	private int speedResetCounter; // Count updates until speed returns to normal
+	private char whiskerLineColour; // field to track whisker line colour
 
 	// Constants - tweak these for different robot "personalities"
 	private static final int SPEED_RESET_DELAY = 20; // How long to maintain boosted speed
@@ -49,7 +50,25 @@ public class Whisker extends Robot {
 		originalSpeed = is;
 		isSpeedBoosted = false;
 		speedResetCounter = 0;
+		whiskerLineColour = 'l'; // Default whisker color on normal white background
 		updateWhiskers();
+	}
+
+	/**
+	 * Toggle whisker color (black <-> white) for blackout mode.
+	 */
+	public void toggleWhiskerColor(boolean isBlackOut) {
+		// If going into blackout and whiskers are black, make them white
+		if (isBlackOut && whiskerLineColour == 'l') {
+			whiskerLineColour = 'w';
+		}
+		// If lights come back on and whiskers are white, make them black
+		else if (!isBlackOut && whiskerLineColour == 'w') {
+			whiskerLineColour = 'l';
+		}
+		// Update both whisker lines to the new color
+		leftWhisker.setLineColour(whiskerLineColour);
+		rightWhisker.setLineColour(whiskerLineColour);
 	}
 
 	/**
@@ -70,6 +89,10 @@ public class Whisker extends Robot {
 		// Create whisker lines for collision checks
 		leftWhisker = new Line(x, y, leftX, leftY);
 		rightWhisker = new Line(x, y, rightX, rightY);
+
+		// Set the whisker line color
+		leftWhisker.setLineColour(whiskerLineColour);
+		rightWhisker.setLineColour(whiskerLineColour);
 	}
 
 	/**

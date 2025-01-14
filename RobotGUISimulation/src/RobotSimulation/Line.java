@@ -10,6 +10,7 @@ public class Line {
 	private double[] xy; // xy point used in calculation
 	private double gradient; // gradient of line
 	private double offset; // offset
+	private char lineColour; // colour of line
 
 	/**
 	 * construct a basic line
@@ -96,6 +97,15 @@ public class Line {
 	 */
 	public double getOffset() {
 		return offset;
+	}
+
+	// Getter and setter for line color
+	public char getLineColor() {
+		return lineColour;
+	}
+
+	public void setLineColour(char newColour) {
+		lineColour = newColour;
 	}
 
 	/**
@@ -238,7 +248,19 @@ public class Line {
 		return sdist;
 	}
 
+	public void toggleLineColorForBlackOut(boolean blackOut) {
+		// If we were black ('l'), and blackout is ON, turn to white ('w').
+		if (blackOut && lineColour == 'l') {
+			lineColour = 'w';
+		}
+		// If we were white ('w'), and blackout is OFF again, turn back to black ('l').
+		else if (!blackOut && lineColour == 'w') {
+			lineColour = 'l';
+		}
+	}
+
 	public void drawLine(MyCanvas mc) {
+		mc.setStrokeColour(lineColour);
 		mc.drawLine(coords[0], coords[1], coords[2], coords[3]);
 		// TODO Auto-generated method stub
 

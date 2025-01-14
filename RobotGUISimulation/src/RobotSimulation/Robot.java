@@ -5,12 +5,27 @@ public class Robot extends ArenaItem {
 	RobotArena arena; // Reference to the arena where the robot operates
 	double rAngle, rSpeed; // Angle of rotation and speed of the robot
 
+	protected char wheelLineColour = 'l';
+
 	public Robot(double ix, double iy, double ir, double ia, double is, RobotArena arena) {
 		super(ix, iy, ir); // Initialize the parent class with position and radius
 		this.arena = arena; // Assign the arena to the robot
 		col = 'r'; // Set the color representation of the robot
 		rAngle = ia; // Initialize the rotation angle
 		rSpeed = is; // Initialize the speed
+		wheelLineColour = 'l'; // Set the color representation of the wheel lines
+	}
+
+	/**
+	 * Toggle the wheel color from black to white if blackout, or back to black if
+	 * lights on again.
+	 */
+	public void toggleWheelColor(boolean blackOut) {
+		if (blackOut && wheelLineColour == 'l') {
+			wheelLineColour = 'w'; // Turn them white
+		} else if (!blackOut && wheelLineColour == 'w') {
+			wheelLineColour = 'l'; // Turn them black
+		}
 	}
 
 	@Override
@@ -20,6 +35,8 @@ public class Robot extends ArenaItem {
 
 		// Optionally set a thicker line width for drawing the wheels
 		mc.setLineWidth(5);
+
+		mc.setStrokeColour(wheelLineColour);
 
 		// These two wheels each extend from angle ±45° to angle ±135° relative to the
 		// robot’s heading.

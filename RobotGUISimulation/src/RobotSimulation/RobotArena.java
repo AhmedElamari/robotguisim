@@ -27,6 +27,7 @@ public class RobotArena {
 		items.add(new Prey(200, 200, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
+		items.add(new Whisker(100, 100, 10, 45, 1, this));
 
 	}
 
@@ -203,11 +204,7 @@ public class RobotArena {
 
 	// Draws the arena and its items on the provided canvas
 	public void drawArena(MyCanvas mc) {
-		if (isBlackOut) {
-			mc.setBackgroundColor('d'); // Set background to dark if blackout
-		} else {
-			mc.setBackgroundColor('w'); // Set background to white otherwise
-		}
+		mc.setBackgroundColor(isBlackOut ? 'l' : 'w'); // Set background color);
 		for (ArenaItem i : items) {
 			i.drawItem(mc); // Draw each item in the arena
 		}
@@ -383,9 +380,20 @@ public class RobotArena {
 		return true; // Position is free
 	}
 
-	// Toggles the blackout state of the arena
 	public void blackOut() {
-		isBlackOut = !isBlackOut; // Switch blackout state
+		isBlackOut = !isBlackOut;
+
+		for (ArenaItem item : items) {
+			// If it is a Whisker, toggle whisker color
+			if (item instanceof Whisker) {
+				((Whisker) item).toggleWhiskerColor(isBlackOut);
+			}
+
+			// If it has some wheels or lines, toggle them too
+			if (item instanceof Robot) {
+				((Robot) item).toggleWheelColor(isBlackOut);
+			}
+		}
 	}
 
 }

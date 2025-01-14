@@ -18,6 +18,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
@@ -107,66 +108,43 @@ public class RobotViewer extends Application {
 		return menuBar;
 	}
 
+	// Add tooltips and consistent styles for buttons
 	private HBox setButtons() {
 		Button btnStart = new Button("Start");
-		btnStart.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				timer.start();
-			}
-		});
+		btnStart.setTooltip(new Tooltip("Start the simulation"));
+		btnStart.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;");
+		btnStart.setOnAction(event -> timer.start());
 
 		Button btnStop = new Button("Stop");
-		btnStop.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				timer.stop();
-			}
-		});
+		btnStop.setTooltip(new Tooltip("Stop the simulation"));
+		btnStop.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
+		btnStop.setOnAction(event -> timer.stop());
 
 		Button btnAdd = new Button("Add Robot");
-		btnAdd.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				arena.addRobot();
-				drawWorld();
-			}
-		});
-		Button btnAddObstacle = new Button("Add Obstacle");
-		btnAddObstacle.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				arena.addObstacle();
-				drawWorld();
-			}
-		});
-		Button btnWhisker = new Button("Add Whisker");
-		btnWhisker.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				arena.addWhisker();
-				drawWorld();
-			}
-		});
-		Button btnLight = new Button("Add Light");
-		btnLight.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				arena.addLight();
-				drawWorld();
-			}
-		});
-		Button btnBlackOut = new Button("Black Out");
-		btnBlackOut.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent event) {
-				arena.blackOut();
-				drawWorld();
-			}
+		btnAdd.setTooltip(new Tooltip("Add a robot to the arena"));
+		btnAdd.setStyle("-fx-background-color: #007bff; -fx-text-fill: white;");
+		btnAdd.setOnAction(event -> {
+			arena.addRobot();
+			drawWorld();
 		});
 
-		return new HBox(new Label("Control: "), btnStart, btnStop, new Label("Add: "), btnAdd, btnAddObstacle, btnLight,
-				btnWhisker, new Label("Environment: "), btnBlackOut);
+		Button btnAddObstacle = new Button("Add Obstacle");
+		btnAddObstacle.setTooltip(new Tooltip("Add an obstacle"));
+		btnAddObstacle.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black;");
+		btnAddObstacle.setOnAction(event -> {
+			arena.addObstacle();
+			drawWorld();
+		});
+
+		Button btnBlackOut = new Button("Black Out");
+		btnBlackOut.setTooltip(new Tooltip("Toggle blackout mode"));
+		btnBlackOut.setStyle("-fx-background-color: #343a40; -fx-text-fill: white;");
+		btnBlackOut.setOnAction(event -> {
+			arena.blackOut();
+			drawWorld();
+		});
+
+		return new HBox(btnStart, btnStop, btnAdd, btnAddObstacle, btnBlackOut);
 	}
 
 	public void showScore(double x, double y, int score) {

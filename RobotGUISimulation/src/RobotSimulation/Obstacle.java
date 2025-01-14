@@ -12,7 +12,7 @@ public class Obstacle extends ArenaItem {
 	 * up to your arena design.
 	 */
 	public void addObstacle(double x, double y, double rad, char col) {
-		Obstacle o = new Obstacle(x, y, rad);
+		new Obstacle(x, y, rad);
 		// Optionally add 'o' to a collection in RobotArena or elsewhere
 	}
 
