@@ -1,9 +1,9 @@
 package RobotSimulation;
 
 /**
- * @author me class for representing a line and performing operations on it such
- *         as finding whether/where two lines intersect or how far away the
- *         lines is from a point
+ * @author Ahmed Elamari class for representing a line and performing operations
+ *         on it such as finding whether/where two lines intersect or how far
+ *         away the lines is from a point
  */
 public class Line {
 	private double[] coords; // coordinates of line (x1, y1, x2, y2)

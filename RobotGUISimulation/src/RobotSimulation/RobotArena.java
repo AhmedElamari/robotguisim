@@ -25,9 +25,15 @@ public class RobotArena {
 		// Example initial robot
 		items.add(new PredatorRobot(300, 300, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
-		items.add(new Prey(200, 200, 10, 45, 2, this));
-		items.add(new Prey(200, 200, 10, 45, 2, this));
+		items.add(new Robot(100, 100, 10, 45, 2, this));
 		items.add(new Whisker(100, 100, 10, 45, 1, this));
+		items.add(new Light(50, 50, 10));// place light in top corners of arena
+		items.add(new Light(450, 50, 10));
+		items.add(new Light(50, 350, 10));
+		items.add(new Light(450, 350, 10));
+		items.add(new Beam(150, 150, 10, 45, 2, this));
+		items.add(new BeamLight(150, 150, 10, 45, 2, this));
+		items.add(new Obstacle(150, 150, 10));
 
 	}
 
@@ -375,18 +381,85 @@ public class RobotArena {
 
 	// Adds a new obstacle at a random position in the arena
 	public void addObstacle() {
-		double x = Math.random() * xMax; // Random X position
-		double y = Math.random() * yMax; // Random Y position
-		Obstacle newObstacle = new Obstacle(x, y, 10);
-		items.add(newObstacle); // Ensure obstacle is added to the items ArrayList
+		double maxTries = 100; // Maximum attempts to find a free spot
+		double obsRad = 10; // Radius of new obstacle
+		boolean foundSpot = false; // Flag to track success
+
+		double candidateX = 0;
+		double candidateY = 0;
+
+		for (int i = 0; i < maxTries && !foundSpot; i++) {
+			// Random position, ensuring the obstacle is fully within arena bounds
+			candidateX = obsRad + Math.random() * (xMax - 2 * obsRad);
+			candidateY = obsRad + Math.random() * (yMax - 2 * obsRad);
+
+			// Check if it overlaps any Robot
+			if (!overlapsAnyItem(candidateX, candidateY, obsRad)) {
+				foundSpot = true; // We found a valid position
+			}
+		}
+		if (foundSpot) {
+			// Create and add the Obstacle at candidateX, candidateY
+			Obstacle newObstacle = new Obstacle(candidateX, candidateY, obsRad);
+			items.add(newObstacle);
+			System.out.println("Added Obstacle at (" + candidateX + ", " + candidateY + ")");
+		} else {
+			// Couldn’t find a valid position (arena might be too crowded)
+			System.out.println("Failed to place Obstacle after " + maxTries + " attempts.");
+		}
 	}
 
-	// Adds a new light at a random position in the arena
+	// Adds a new Light at a random valid position in the arena, without overlapping
+	// any Robot.
 	public void addLight() {
-		double x = Math.random() * xMax; // Random X position
-		double y = Math.random() * yMax; // Random Y position
-		Light newLight = new Light(x, y, 10);
-		items.add(newLight); // Ensure light is added to the items ArrayList
+		double lightRadius = 10; // radius of new Light
+		int maxTries = 100; // how many times we'll try to find a free spot
+		boolean foundSpot = false;
+
+		double candidateX = 0;
+		double candidateY = 0;
+
+		for (int i = 0; i < maxTries && !foundSpot; i++) {
+			// Random position, ensuring the Light is fully within arena bounds:
+			candidateX = lightRadius + Math.random() * (xMax - 2 * lightRadius);
+			candidateY = lightRadius + Math.random() * (yMax - 2 * lightRadius);
+
+			// Check if it overlaps any Robot
+			if (!overlapsAnyItem(candidateX, candidateY, lightRadius)) {
+				foundSpot = true; // We found a valid position
+			}
+		}
+
+		if (foundSpot) {
+			// Create and add the Light at candidateX, candidateY
+			Light newLight = new Light(candidateX, candidateY, lightRadius);
+			items.add(newLight);
+			System.out.println("Added Light at (" + candidateX + ", " + candidateY + ")");
+		} else {
+			// Couldn’t find a valid position (arena might be too crowded)
+			System.out.println("Failed to place Light after " + maxTries + " attempts.");
+		}
+	}
+
+	/**
+	 * Checks if placing an item (e.g., a Light) at (lx, ly) with radius lRad would
+	 * overlap ANY existing item in the arena (Robot, Light, Obstacle, etc.).
+	 * 
+	 * @return true if overlapping; false otherwise
+	 */
+	private boolean overlapsAnyItem(double lx, double ly, double lRad) {
+		for (ArenaItem item : items) {
+			// Calculate distance to this arena item
+			double dx = lx - item.getX();
+			double dy = ly - item.getY();
+			double dist = Math.sqrt(dx * dx + dy * dy);
+
+			// Overlap if distance < sum of radii
+			if (dist < (lRad + item.getRad())) {
+				return true;
+			}
+		}
+		return false; // No overlap found with any existing item
 	}
 
 	// Adds a new whisker at a random position in the arena
@@ -395,16 +468,6 @@ public class RobotArena {
 		double y = Math.random() * yMax; // Random Y position
 		Whisker newWhisker = new Whisker(x, y, 10, 45, 1, this);
 		items.add(newWhisker); // Ensure whisker is added to the items ArrayList
-	}
-
-	// Checks if a position is free for movement based on collisions with items
-	public boolean canMoveHere(double x, double y, double rad) {
-		for (ArenaItem i : items) {
-			if (i.hitting(x, y, rad)) {
-				return false; // Position is occupied
-			}
-		}
-		return true; // Position is free
 	}
 
 	public void blackOut() {

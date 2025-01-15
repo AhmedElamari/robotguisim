@@ -76,7 +76,7 @@ public class RobotViewer extends Application {
 				drawStatus();
 			}
 			// if mouse pressed all robots go there
-			else if (e.getButton() == MouseButton.PRIMARY) {
+			else if (e.getButton() == MouseButton.MIDDLE) {
 				arena.setRobot(e.getX(), e.getY());
 				drawWorld();
 			}
@@ -192,18 +192,22 @@ public class RobotViewer extends Application {
 			drawWorld();
 		});
 
-		Button btnBlackOut = new Button("Black Out");
-		btnBlackOut.setTooltip(new Tooltip("Toggle blackout mode"));
-		btnBlackOut.setStyle("-fx-background-color: #343a40; -fx-text-fill: white;");
+		Button btnBlackOut = new Button("Add Light");
+		btnBlackOut.setTooltip(new Tooltip("Add a light source"));
+		btnBlackOut.setStyle("-fx-background-color: #FFD700; -fx-text-fill: white;");
 		btnBlackOut.setOnAction(event -> {
-			arena.blackOut();
+			arena.addLight();
 			drawWorld();
 		});
 
 		// Example "Score +1" button to show data binding usage
-		Button btnScoreUp = new Button("Score +1");
-		btnScoreUp.setStyle("-fx-background-color: #17a2b8; -fx-text-fill: white;");
-		btnScoreUp.setOnAction(e -> scoreProperty.set(scoreProperty.get() + 1));
+		Button btnScoreUp = new Button("Black Out");
+		btnScoreUp.setTooltip(new Tooltip("Black out the arena"));
+		btnScoreUp.setStyle("-fx-background-color: #343a40; -fx-text-fill: white;");
+		btnScoreUp.setOnAction(event -> {
+			arena.blackOut();
+			drawWorld();
+		});
 
 		HBox buttonBar = new HBox(10, btnStart, btnStop, btnAdd, btnAddObstacle, btnBlackOut, btnScoreUp);
 		buttonBar.setPadding(new Insets(10));

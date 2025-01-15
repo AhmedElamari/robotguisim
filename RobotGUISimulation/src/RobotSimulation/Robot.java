@@ -1,4 +1,7 @@
 // Java class for the Robot object, which extends ArenaItem and represents a robot within the arena.
+/**
+ * @author Ahmed Elamari class for representing a robot
+ */
 package RobotSimulation;
 
 public class Robot extends ArenaItem {

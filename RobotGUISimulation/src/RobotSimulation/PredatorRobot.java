@@ -255,7 +255,8 @@ public class PredatorRobot extends Beam {
 					// slow down prey speed
 					if (dist < ROAR_RANGE) {
 						Prey p = (Prey) item;
-						p.rSpeed = Math.max(p.rSpeed * 0.5, 0.5);
+						p.rSpeed = Math.max(p.rSpeed * 0.8, 0.8); // Slow down by 20% was 50% but that was too easy for
+																	// predator to catch prey
 					}
 
 				}

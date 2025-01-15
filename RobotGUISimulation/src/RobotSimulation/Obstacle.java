@@ -8,15 +8,6 @@ public class Obstacle extends ArenaItem {
 	}
 
 	/**
-	 * Example method to create a new obstacle; how you store/add this obstacle is
-	 * up to your arena design.
-	 */
-	public void addObstacle(double x, double y, double rad, char col) {
-		new Obstacle(x, y, rad);
-		// Optionally add 'o' to a collection in RobotArena or elsewhere
-	}
-
-	/**
 	 * Draw a simple circle to represent the obstacle.
 	 */
 	@Override
