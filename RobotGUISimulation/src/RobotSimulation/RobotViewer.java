@@ -10,6 +10,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
@@ -21,6 +22,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SplitMenuButton;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -30,21 +32,41 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * The <code>RobotViewer</code> class represents the primary GUI application for
+ * the Robot Simulation. It builds the user interface, manages user interaction
+ * via mouse and menus, and drives the simulation via an animation timer.
+ *
+ * <p>
+ * This class creates and configures the main window, sets up the drawing
+ * canvas, binds simulation data (e.g. score), and handles events such as adding
+ * robots, obstacles, lights, and toggling a blackout.
+ * </p>
+ *
+ * @author Ahmed Elamari
+ * @version 2.0
+ */
 public class RobotViewer extends Application {
 
+	/** The custom canvas used to render the simulation. */
 	private MyCanvas mc;
+	/** Timer to drive the animation loop of the simulation. */
 	private AnimationTimer timer;
-	private VBox rtPane; // Will hold labels describing arena items
-	private ScrollPane rtScroll; // Wraps rtPane for scrolling
+	/** Right panel (VBox) for displaying status labels about arena items. */
+	private VBox rtPane;
+	/** ScrollPane that wraps the right panel for scrolling if necessary. */
+	private ScrollPane rtScroll;
+	/** The simulation arena containing all robots, obstacles, lights, etc. */
 	private RobotArena arena;
+	/** Helper class for file operations on simulation data. */
 	private TextFile tf = new TextFile("Text Files", "txt");
-	private Robot selectedRobot = null; // Example selected robot for data binding
-
-	// Example score property to demonstrate data binding
+	/** The currently selected robot (for example when context menu is shown). */
+	private Robot selectedRobot = null;
+	/** Example score property demonstrating data binding with UI controls. */
 	private IntegerProperty scoreProperty = new SimpleIntegerProperty(0);
 
 	/**
-	 * Show About dialog
+	 * Displays an "About" dialog providing basic application information.
 	 */
 	private void showAbout() {
 		Alert alert = new Alert(AlertType.INFORMATION);
@@ -55,36 +77,45 @@ public class RobotViewer extends Application {
 	}
 
 	/**
-	 * When the mouse is pressed on the Canvas, set the robot to that location.
+	 * Sets up mouse event handlers for the drawing canvas.
+	 *
+	 * <p>
+	 * This method registers event handlers to support:
+	 * <ul>
+	 * <li>Right-click: select a robot and display a context menu.</li>
+	 * <li>Middle-click: move all robots to the clicked location.</li>
+	 * <li>Left-drag: move the selected robot.</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param canvas the Canvas on which mouse events are to be handled
 	 */
 	void setMouseEvents(Canvas canvas) {
 		// Handle mouse press
 		canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
-			// Check if right-click
+			// Right-click: attempt to select a robot and show context menu
 			if (e.getButton() == MouseButton.SECONDARY) {
 				Robot clickedRobot = arena.getRoboAt(e.getX(), e.getY());
 				if (clickedRobot != null) {
-					// Show context menu for the clicked robot
 					ContextMenu contextMenu = createRobotContextMenu(clickedRobot);
 					contextMenu.show(canvas, e.getScreenX(), e.getScreenY());
 					selectedRobot = clickedRobot;
 				} else {
-					// If right-click on empty space, clear selection
 					selectedRobot = null;
 				}
 				drawWorld();
 				drawStatus();
 			}
-			// if mouse pressed all robots go there
+			// Middle-click: move all robots to the clicked location
 			else if (e.getButton() == MouseButton.MIDDLE) {
 				arena.setRobot(e.getX(), e.getY());
 				drawWorld();
 			}
 		});
 
-		// Handle dragging (typically left-button drag)
+		// Handle mouse drag (typically with left button)
 		canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
-			// Example: move the selected robot with left-drag
+			// If a robot is selected and the primary button is used, update its position.
 			if (selectedRobot != null && e.getButton() == MouseButton.PRIMARY) {
 				selectedRobot.setXY(e.getX(), e.getY());
 				drawWorld();
@@ -93,7 +124,14 @@ public class RobotViewer extends Application {
 	}
 
 	/**
-	 * Create a context menu for the robot.
+	 * Creates a context menu for interacting with a robot.
+	 *
+	 * <p>
+	 * This menu provides options to select or delete the given robot.
+	 * </p>
+	 *
+	 * @param robot the robot for which the context menu is created
+	 * @return the ContextMenu configured for the robot
 	 */
 	private ContextMenu createRobotContextMenu(Robot robot) {
 		ContextMenu menu = new ContextMenu();
@@ -113,7 +151,14 @@ public class RobotViewer extends Application {
 	}
 
 	/**
-	 * Create the MenuBar with File and Help menus.
+	 * Creates and returns the MenuBar containing the File and Help menus.
+	 *
+	 * <p>
+	 * The File menu allows creating a new arena, saving, loading, and exiting. The
+	 * Help menu contains an About item.
+	 * </p>
+	 *
+	 * @return the configured MenuBar
 	 */
 	MenuBar setMenu() {
 		MenuBar menuBar = new MenuBar();
@@ -125,7 +170,7 @@ public class RobotViewer extends Application {
 		mNew.setOnAction(actionEvent -> {
 			arena = new RobotArena(400, 500);
 			drawWorld();
-			scoreProperty.set(0); // Reset example score
+			scoreProperty.set(0); // Reset the score property
 		});
 
 		MenuItem mSave = new MenuItem("Save");
@@ -157,33 +202,71 @@ public class RobotViewer extends Application {
 
 	/**
 	 * Creates the bottom button bar for controlling the simulation.
+	 *
+	 * <p>
+	 * This pane includes buttons for starting/stopping the simulation, adding
+	 * robots, obstacles, lights, and toggling blackout mode.
+	 * </p>
+	 *
+	 * @return an HBox containing the control buttons
 	 */
 	private HBox setButtons() {
+		// Start simulation button
 		Button btnStart = new Button("Start");
 		btnStart.setTooltip(new Tooltip("Start the simulation"));
 		btnStart.setStyle("-fx-background-color: #28a745; -fx-text-fill: white;");
 		btnStart.setOnAction(event -> timer.start());
 
+		// Stop simulation button
 		Button btnStop = new Button("Stop");
 		btnStop.setTooltip(new Tooltip("Stop the simulation"));
 		btnStop.setStyle("-fx-background-color: #dc3545; -fx-text-fill: white;");
 		btnStop.setOnAction(event -> timer.stop());
 
-		Button btnAdd = new Button("Add Robot");
-		btnAdd.setTooltip(new Tooltip("Add a robot to the arena"));
-		btnAdd.setStyle("-fx-background-color: #007bff; -fx-text-fill: white;");
-		btnAdd.setOnAction(event -> {
-			arena.addRobot();
+		// === SplitMenuButton for adding different robots ===
+		SplitMenuButton btnAddRobot = new SplitMenuButton();
+		btnAddRobot.setText("Add Robot");
+		btnAddRobot.setTooltip(new Tooltip("Add a robot to the arena"));
+		btnAddRobot.setStyle("-fx-background-color: #007bff; -fx-text-fill: white;");
+
+		// Default action (if user clicks main button area)
+		btnAddRobot.setOnAction(e -> {
+			arena.addRobot(); // The "normal" robot
 			drawWorld();
-			// A quick fade animation for visual feedback
-			FadeTransition fade = new FadeTransition(Duration.millis(1000), btnAdd);
-			fade.setFromValue(1.0);
-			fade.setToValue(0.3);
-			fade.setCycleCount(2);
-			fade.setAutoReverse(true);
-			fade.play();
+			playFadeAnimation(btnAddRobot);
 		});
 
+		// Menu items for different types of robots
+		MenuItem normalRobotItem = new MenuItem("Normal Robot");
+		normalRobotItem.setOnAction(e -> {
+			arena.addRobot();
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+
+		MenuItem whiskerRobotItem = new MenuItem("Whisker Robot");
+		whiskerRobotItem.setOnAction(e -> {
+			arena.addWhisker(); // You'd implement addWhiskerRobot() in RobotArena
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+		MenuItem beamRobotItem = new MenuItem("Beam Robot");
+		beamRobotItem.setOnAction(e -> {
+			arena.addBeamLight(); // You'd implement addLightRobot() in RobotArena
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+		MenuItem lightRobotItem = new MenuItem("Light Robot");
+		lightRobotItem.setOnAction(e -> {
+			arena.addBeamLight(); // You'd implement addLightRobot() in RobotArena
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+
+		// Add all robot-type items to the dropdown
+		btnAddRobot.getItems().addAll(normalRobotItem, whiskerRobotItem, beamRobotItem, lightRobotItem);
+
+		// Add obstacle button
 		Button btnAddObstacle = new Button("Add Obstacle");
 		btnAddObstacle.setTooltip(new Tooltip("Add an obstacle"));
 		btnAddObstacle.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black;");
@@ -192,56 +275,82 @@ public class RobotViewer extends Application {
 			drawWorld();
 		});
 
-		Button btnBlackOut = new Button("Add Light");
-		btnBlackOut.setTooltip(new Tooltip("Add a light source"));
-		btnBlackOut.setStyle("-fx-background-color: #FFD700; -fx-text-fill: white;");
-		btnBlackOut.setOnAction(event -> {
+		// Add light button
+		Button btnAddLight = new Button("Add Light");
+		btnAddLight.setTooltip(new Tooltip("Add a light source"));
+		btnAddLight.setStyle("-fx-background-color: #FFD700; -fx-text-fill: white;");
+		btnAddLight.setOnAction(event -> {
 			arena.addLight();
 			drawWorld();
 		});
 
-		// Example "Score +1" button to show data binding usage
-		Button btnScoreUp = new Button("Black Out");
-		btnScoreUp.setTooltip(new Tooltip("Black out the arena"));
-		btnScoreUp.setStyle("-fx-background-color: #343a40; -fx-text-fill: white;");
-		btnScoreUp.setOnAction(event -> {
+		// Black out button
+		Button btnBlackOut = new Button("Black Out");
+		btnBlackOut.setTooltip(new Tooltip("Black out the arena"));
+		btnBlackOut.setStyle("-fx-background-color: #343a40; -fx-text-fill: white;");
+		btnBlackOut.setOnAction(event -> {
 			arena.blackOut();
 			drawWorld();
 		});
 
-		HBox buttonBar = new HBox(10, btnStart, btnStop, btnAdd, btnAddObstacle, btnBlackOut, btnScoreUp);
+		// Put them all in an HBox
+		HBox buttonBar = new HBox(10, btnStart, btnStop, btnAddRobot, // <-- Our new SplitMenuButton
+				btnAddObstacle, btnAddLight, btnBlackOut);
 		buttonBar.setPadding(new Insets(10));
 		buttonBar.setAlignment(Pos.CENTER);
 		return buttonBar;
 	}
 
 	/**
-	 * Draw a score at coordinates (x, y) on the canvas.
+	 * Simple utility method to do a quick fade animation for visual feedback.
+	 */
+	private void playFadeAnimation(Node node) {
+		FadeTransition fade = new FadeTransition(Duration.millis(1000), node);
+		fade.setFromValue(1.0);
+		fade.setToValue(0.3);
+		fade.setCycleCount(2);
+		fade.setAutoReverse(true);
+		fade.play();
+	}
+
+	/**
+	 * Displays the current score on the canvas at the specified coordinates.
+	 *
+	 * @param x     the x-coordinate for the score display
+	 * @param y     the y-coordinate for the score display
+	 * @param score the score to display
 	 */
 	public void showScore(double x, double y, int score) {
 		mc.showText(x, y, Integer.toString(score));
 	}
 
 	/**
-	 * Populate the right panel with labels describing the arena items. Now centers
-	 * the text and adds scroll if needed.
+	 * Populates the right status panel with labels describing the arena items.
+	 *
+	 * <p>
+	 * This method clears the existing labels and re-adds updated descriptions for
+	 * each item in the arena.
+	 * </p>
 	 */
 	public void drawStatus() {
 		rtPane.getChildren().clear();
-		ArrayList<String> alrRs = arena.describeAll();
+		ArrayList<String> descriptions = arena.describeAll();
 
-		for (String s : alrRs) {
+		for (String s : descriptions) {
 			Label label = new Label(s);
-			// Center each label’s text
 			label.setAlignment(Pos.CENTER);
-			// Optionally apply styling
 			label.setStyle("-fx-padding: 5; -fx-font-size: 12px; -fx-text-alignment: center;");
 			rtPane.getChildren().add(label);
 		}
 	}
 
 	/**
-	 * Save the arena to file.
+	 * Saves the current arena state to a file.
+	 *
+	 * <p>
+	 * This method uses the TextFile helper class to create a file and write the
+	 * serialized arena data to it.
+	 * </p>
 	 */
 	public void Save() {
 		if (tf.createFile()) {
@@ -259,7 +368,12 @@ public class RobotViewer extends Application {
 	}
 
 	/**
-	 * Load the arena from file.
+	 * Loads the arena state from a file.
+	 *
+	 * <p>
+	 * This method reads saved arena data and reconstructs the simulation arena. If
+	 * an error occurs, an error dialog is shown.
+	 * </p>
 	 */
 	public void Load() {
 		try {
@@ -287,13 +401,29 @@ public class RobotViewer extends Application {
 	}
 
 	/**
-	 * Redraw the arena on the canvas.
+	 * Redraws the simulation arena on the canvas.
+	 *
+	 * <p>
+	 * This method clears the canvas and then invokes the arena's drawing routine.
+	 * </p>
 	 */
 	public void drawWorld() {
 		mc.clearCanvas();
 		arena.drawArena(mc);
 	}
 
+	/**
+	 * The main entry point for the JavaFX application.
+	 *
+	 * <p>
+	 * This method sets up the primary Stage, constructs all UI elements including
+	 * the menu, canvas, right status panel, and bottom control buttons, and binds
+	 * an animation timer to drive the simulation updates.
+	 * </p>
+	 *
+	 * @param primaryStage the primary stage for this application
+	 * @throws Exception if an error occurs during initialization
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("Robot GUI Simulation");
@@ -301,15 +431,20 @@ public class RobotViewer extends Application {
 		BorderPane bp = new BorderPane();
 		bp.setPadding(new Insets(10, 20, 10, 20));
 
-		// ---- Top Menu ----
-		bp.setTop(setMenu());
+		// ---- Top: Menu and Score ----
+		MenuBar menuBar = setMenu();
+		Label scoreLabel = new Label();
+		scoreLabel.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
+		// Bind score property to update the score label dynamically
+		scoreLabel.textProperty().bind(scoreProperty.asString("Score: %d"));
+		VBox topVBox = new VBox(menuBar, scoreLabel);
+		bp.setTop(topVBox);
 
 		// ---- Left: Canvas for drawing ----
 		Group root = new Group();
 		Canvas canvas = new Canvas(400, 500);
 		root.getChildren().add(canvas);
 		bp.setLeft(root);
-
 		mc = new MyCanvas(canvas.getGraphicsContext2D(), 400, 500);
 		setMouseEvents(canvas);
 
@@ -317,7 +452,7 @@ public class RobotViewer extends Application {
 		arena = new RobotArena(400, 500);
 		drawWorld();
 
-		// Animation timer
+		// ---- Animation Timer: Simulation Loop ----
 		timer = new AnimationTimer() {
 			@Override
 			public void handle(long currentNanoTime) {
@@ -328,34 +463,19 @@ public class RobotViewer extends Application {
 			}
 		};
 
-		// ---- Right: a scrollable panel for statuses ----
+		// ---- Right: Scrollable Status Panel ----
 		rtPane = new VBox(5);
 		rtPane.setAlignment(Pos.TOP_CENTER);
 		rtPane.setPadding(new Insets(5));
-
 		rtScroll = new ScrollPane(rtPane);
-		rtScroll.setFitToWidth(true); // Ensures content fits the width
+		rtScroll.setFitToWidth(true);
 		rtScroll.setStyle("-fx-background-color: #f8f9fa;");
-		// You can also style the scroll bars, e.g., by CSS in an external file
-
 		bp.setRight(rtScroll);
 
-		// ---- Bottom: Buttons ----
+		// ---- Bottom: Control Buttons ----
 		bp.setBottom(setButtons());
 
-		// Example data binding: create a Label for the score
-		Label scoreLabel = new Label();
-		scoreLabel.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
-		// Bind label text to score property
-		scoreLabel.textProperty().bind(scoreProperty.asString("Score: %d"));
-
-		// We’ll add both the MenuBar and the score label in a VBox
-		VBox topVBox = new VBox(setMenu(), scoreLabel);
-		bp.setTop(topVBox);
-
 		Scene scene = new Scene(bp, 700, 600);
-
-		// Make the layout responsive
 		bp.prefHeightProperty().bind(scene.heightProperty());
 		bp.prefWidthProperty().bind(scene.widthProperty());
 
@@ -363,6 +483,11 @@ public class RobotViewer extends Application {
 		primaryStage.show();
 	}
 
+	/**
+	 * The main method launches the JavaFX application.
+	 *
+	 * @param args command-line arguments (not used)
+	 */
 	public static void main(String[] args) {
 		Application.launch(args);
 	}
