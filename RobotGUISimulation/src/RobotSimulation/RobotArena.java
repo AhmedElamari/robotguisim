@@ -65,14 +65,10 @@ public class RobotArena {
 		items.add(new PredatorRobot(300, 300, 10, 45, 2, this));
 		items.add(new Prey(200, 200, 10, 45, 2, this));
 		items.add(new Robot(100, 100, 10, 45, 2, this));
-		items.add(new Whisker(100, 100, 10, 45, 1, this));
-		items.add(new Light(50, 50, 10)); // Place light in top corners of arena
-		items.add(new Light(450, 50, 10));
-		items.add(new Light(50, 350, 10));
-		items.add(new Light(450, 350, 10));
-		items.add(new Beam(150, 150, 10, 45, 2, this));
-		items.add(new BeamLight(150, 150, 10, 45, 2, this));
-		items.add(new Obstacle(150, 150, 10));
+		items.add(new Whisker(100, 50, 10, 45, 1, this));
+		items.add(new Obstacle(350, 100, 10));
+		items.add(new Obstacle(100, 300, 10));
+
 	}
 
 	/**
@@ -636,6 +632,26 @@ public class RobotArena {
 		double y = Math.random() * yMax;
 		BeamLight newBeamLight = new BeamLight(x, y, 10, 45, 2, this);
 		items.add(newBeamLight);
+	}
+
+	/**
+	 * Adds a new prey at a random position in the arena.
+	 */
+	public void addPrey() {
+		double x = Math.random() * xMax;
+		double y = Math.random() * yMax;
+		Prey newPrey = new Prey(x, y, 10, 45, 2, this);
+		items.add(newPrey);
+	}
+
+	/**
+	 * Adds a new predator at a random position in the arena.
+	 */
+	public void addPredator() {
+		double x = Math.random() * xMax;
+		double y = Math.random() * yMax;
+		PredatorRobot newPredator = new PredatorRobot(x, y, 10, 45, 2, this);
+		items.add(newPredator);
 	}
 
 	/**

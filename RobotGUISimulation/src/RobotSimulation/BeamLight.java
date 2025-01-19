@@ -108,11 +108,29 @@ public class BeamLight extends Beam {
 	 */
 	@Override
 	public void adjustItem() {
-		// Move only if the beam has not stopped at a light
+		// Only move if the beam has not stopped at a light
 		if (!isAtLight) {
+			// 1. Randomly adjust the angle slightly (drift)
+			// -0.5 to +0.5 range multiplied by a drift factor
+			double drift = (Math.random() - 0.5) * 2.0; // range: -1 to +1
+			double driftFactor = 0.3; // how strongly to apply the drift
+			rAngle += driftFactor * drift; // add a small deviation to rAngle
+
+			// 2. Randomly vary the speed a bit
+			// E.g. ±5% variation around the original speed
+			double speedVariation = 1.0 + ((Math.random() - 0.5) * 0.1);
+			double currentSpeed = rSpeed * speedVariation;
+
+			// 3. Convert the angle to radians for the movement calculation
 			double radAngle = Math.toRadians(rAngle);
-			x += rSpeed * Math.cos(radAngle);
-			y += rSpeed * Math.sin(radAngle);
+
+			// 4. Update x and y coordinates based on the adjusted speed and angle
+			x += currentSpeed * Math.cos(radAngle);
+			y += currentSpeed * Math.sin(radAngle);
+
+			// 5. (Optional) Adding a small damping/friction so that speed gradually
+			// decreases:
+			// rSpeed *= 0.99;
 		}
 	}
 

@@ -72,7 +72,7 @@ public class RobotViewer extends Application {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("About");
 		alert.setHeaderText(null);
-		alert.setContentText("Robot Simulation\nVersion 1.0\nAuthor: Ahmed Elamari");
+		alert.setContentText("Robot Simulation\nVersion 1.0\nAuthor: Ahmed Elamari \nStudent Number: 32013680");
 		alert.showAndWait();
 	}
 
@@ -237,7 +237,7 @@ public class RobotViewer extends Application {
 		});
 
 		// Menu items for different types of robots
-		MenuItem normalRobotItem = new MenuItem("Normal Robot");
+		MenuItem normalRobotItem = new MenuItem("Bumper Robot");
 		normalRobotItem.setOnAction(e -> {
 			arena.addRobot();
 			drawWorld();
@@ -246,25 +246,38 @@ public class RobotViewer extends Application {
 
 		MenuItem whiskerRobotItem = new MenuItem("Whisker Robot");
 		whiskerRobotItem.setOnAction(e -> {
-			arena.addWhisker(); // You'd implement addWhiskerRobot() in RobotArena
+			arena.addWhisker(); // Implemented in @RobotArena
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
 		MenuItem beamRobotItem = new MenuItem("Beam Robot");
 		beamRobotItem.setOnAction(e -> {
-			arena.addBeamLight(); // You'd implement addLightRobot() in RobotArena
+			arena.addBeamLight(); // Implemented in @RobotArena
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
 		MenuItem lightRobotItem = new MenuItem("Light Robot");
 		lightRobotItem.setOnAction(e -> {
-			arena.addBeamLight(); // You'd implement addLightRobot() in RobotArena
+			arena.addBeamLight(); // Implemented in @RobotArena
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+		MenuItem preyRobotItem = new MenuItem("Prey Robot");
+		preyRobotItem.setOnAction(e -> {
+			arena.addPrey();
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
+		MenuItem predatorRobotItem = new MenuItem("Predator Robot");
+		predatorRobotItem.setOnAction(e -> {
+			arena.addPredator();
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
 
 		// Add all robot-type items to the dropdown
-		btnAddRobot.getItems().addAll(normalRobotItem, whiskerRobotItem, beamRobotItem, lightRobotItem);
+		btnAddRobot.getItems().addAll(normalRobotItem, whiskerRobotItem, beamRobotItem, lightRobotItem, preyRobotItem,
+				predatorRobotItem);
 
 		// Add obstacle button
 		Button btnAddObstacle = new Button("Add Obstacle");

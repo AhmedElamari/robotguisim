@@ -147,7 +147,7 @@ public class Beam extends Robot {
 			double randomOffset = (Math.random() * 60) - 30;
 			rAngle = (rAngle + randomOffset) % 360;
 		}
-	}
+	};
 
 	/**
 	 * Calculate angle from this robot's position (x,y) to a target (tx, ty).
