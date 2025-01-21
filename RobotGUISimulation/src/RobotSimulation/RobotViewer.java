@@ -169,6 +169,9 @@ public class RobotViewer extends Application {
 		MenuItem mNew = new MenuItem("New");
 		mNew.setOnAction(actionEvent -> {
 			arena = new RobotArena(400, 500);
+			// Re-bind since arena changed
+			scoreProperty.unbind();
+			scoreProperty.bind(arena.scoreProperty());
 			drawWorld();
 			scoreProperty.set(0); // Reset the score property
 		});
@@ -280,13 +283,23 @@ public class RobotViewer extends Application {
 				predatorRobotItem);
 
 		// Add obstacle button
-		Button btnAddObstacle = new Button("Add Obstacle");
-		btnAddObstacle.setTooltip(new Tooltip("Add an obstacle"));
+		SplitMenuButton btnAddObstacle = new SplitMenuButton();
+		btnAddObstacle.setText("Add Obstacle");
+		btnAddObstacle.setTooltip(new Tooltip("Add an obstacle to the arena"));
 		btnAddObstacle.setStyle("-fx-background-color: #ffc107; -fx-text-fill: black;");
-		btnAddObstacle.setOnAction(event -> {
-			arena.addObstacle();
+		btnAddObstacle.setOnAction(e -> {
+			arena.addObstacle(); // The "normal" obstacle
 			drawWorld();
+			playFadeAnimation(btnAddObstacle);
 		});
+		// Add bounce obstacle
+		MenuItem bounceObstacleItem = new MenuItem("Bounce Obstacle");
+		bounceObstacleItem.setOnAction(e -> {
+			arena.addBounceObstacle(); // Implemented in @RobotArena
+			drawWorld();
+			playFadeAnimation(btnAddObstacle);
+		});
+		btnAddObstacle.getItems().add(bounceObstacleItem);
 
 		// Add light button
 		Button btnAddLight = new Button("Add Light");
@@ -463,6 +476,7 @@ public class RobotViewer extends Application {
 
 		// Create the initial arena
 		arena = new RobotArena(400, 500);
+		scoreProperty.bind(arena.scoreProperty());
 		drawWorld();
 
 		// ---- Animation Timer: Simulation Loop ----

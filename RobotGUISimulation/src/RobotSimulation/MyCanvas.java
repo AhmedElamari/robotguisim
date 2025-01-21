@@ -277,4 +277,11 @@ public class MyCanvas {
 		}
 		gc.fillPolygon(xpoints, ypoints, beamPoints.size());
 	}
+
+	public void showCircle(double x, double y, double rad, Color fxColor) {
+		// TODO Auto-generated method stub
+		gc.setFill(fxColor);
+		gc.fillArc(x - rad, y - rad, rad * 2, rad * 2, 0, 360, ArcType.ROUND);
+
+	}
 }

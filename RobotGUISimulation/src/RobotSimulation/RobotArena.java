@@ -2,6 +2,9 @@ package RobotSimulation;
 
 import java.util.ArrayList;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+
 /**
  * The <code>RobotArena</code> class represents the simulation arena where all
  * arena items (robots, obstacles, lights, beams, etc.) are managed, drawn, and
@@ -23,6 +26,9 @@ public class RobotArena {
 	double xMax;
 	/** The maximum Y dimension (height) of the arena. */
 	double yMax;
+
+	// NEW: add an IntegerProperty to track the arena's total score
+	private IntegerProperty totalScore = new SimpleIntegerProperty(0);
 
 	/** List containing all arena items (robots, lights, obstacles, etc.). */
 	protected ArrayList<ArenaItem> items;
@@ -242,7 +248,6 @@ public class RobotArena {
 							char col = parts[4].charAt(0);
 							double angle = Double.parseDouble(parts[5]);
 							double speed = Double.parseDouble(parts[6]);
-							int preyeaten = Integer.parseInt(parts[7]);
 							PredatorRobot pr = new PredatorRobot(x, y, rad, angle, speed, this);
 							pr.col = col;
 							items.add(pr);
@@ -257,6 +262,24 @@ public class RobotArena {
 			}
 			System.out.println("Total items loaded: " + items.size());
 		}
+	}
+
+	/**
+	 * A public method that any item (e.g., a BounceObstacle or a Robot) can call to
+	 * increase the arena's total score.
+	 * 
+	 * @param points the number of points to add
+	 */
+	public void addScore(int points) {
+		totalScore.set(totalScore.get() + points);
+	}
+
+	/**
+	 * Expose the read-only Score property. RobotViewer can bind to this for live
+	 * updates.
+	 */
+	public IntegerProperty scoreProperty() {
+		return totalScore;
 	}
 
 	/**
@@ -551,6 +574,39 @@ public class RobotArena {
 	}
 
 	/**
+	 * Adds a new bounce obstacle at a random valid position in the arena.
+	 *
+	 * <p>
+	 * The method ensures that the new obstacle does not overlap any existing item.
+	 * It tries for a fixed number of attempts before failing.
+	 * </p>
+	 */
+	public void addBounceObstacle() {
+		double maxTries = 100;
+		double obsRad = 10;
+		boolean foundSpot = false;
+		double candidateX = 0;
+		double candidateY = 0;
+
+		for (int i = 0; i < maxTries && !foundSpot; i++) {
+			candidateX = obsRad + Math.random() * (xMax - 2 * obsRad);
+			candidateY = obsRad + Math.random() * (yMax - 2 * obsRad);
+
+			// Check if the candidate position overlaps any existing item.
+			if (!overlapsAnyItem(candidateX, candidateY, obsRad)) {
+				foundSpot = true;
+			}
+		}
+		if (foundSpot) {
+			BounceObstacle newBounceObstacle = new BounceObstacle(candidateX, candidateY, obsRad);
+			items.add(newBounceObstacle);
+			System.out.println("Added Bounce Obstacle at (" + candidateX + ", " + candidateY + ")");
+		} else {
+			System.out.println("Failed to place Bounce Obstacle after " + maxTries + " attempts.");
+		}
+	}
+
+	/**
 	 * Adds a new light at a random valid position in the arena.
 	 *
 	 * <p>
@@ -685,5 +741,15 @@ public class RobotArena {
 	 */
 	public void removeRobot(Robot robot) {
 		items.remove(robot);
+	}
+
+	public Robot[] getRobots() {
+		ArrayList<Robot> robots = new ArrayList<>();
+		for (ArenaItem item : items) {
+			if (item instanceof Robot) {
+				robots.add((Robot) item);
+			}
+		}
+		return robots.toArray(new Robot[0]);
 	}
 }
