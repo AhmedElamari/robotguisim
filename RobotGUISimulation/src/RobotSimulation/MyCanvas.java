@@ -132,6 +132,9 @@ public class MyCanvas {
 		case 'l':
 			ans = Color.BLACK;
 			break;
+		case 'p':
+			ans = Color.PURPLE;
+			break;
 		}
 		return ans;
 	}
@@ -168,6 +171,33 @@ public class MyCanvas {
 	 */
 	public void showCircle(double x, double y, double rad) {
 		gc.fillArc(x - rad, y - rad, rad * 2, rad * 2, 0, 360, ArcType.ROUND);
+	}
+
+	/**
+	 * Draws a filled triangle at the specified coordinates with the given radius
+	 * and color.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param rad
+	 * @param col
+	 */
+	public void showTriangle(double x, double y, double rad, char col) {
+		setFillColour(colFromChar(col)); // Set the fill color based on the provided character
+		showTriangle(x, y, rad);
+	}
+
+	/**
+	 * Draws a filled triangle using the current fill color.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param rad
+	 */
+	private void showTriangle(double x, double y, double rad) {
+		double[] xpoints = { x, x - rad, x + rad };
+		double[] ypoints = { y - rad, y + rad, y + rad };
+		gc.fillPolygon(xpoints, ypoints, 3);
 	}
 
 	/**

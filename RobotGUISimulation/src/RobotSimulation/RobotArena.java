@@ -811,6 +811,16 @@ public class RobotArena {
 	}
 
 	/**
+	 * Adds a new TriRobot at a random position
+	 */
+	public void addTriRobot() {
+		double x = Math.random() * xMax;
+		double y = Math.random() * yMax;
+		triRobot newTriRobot = new triRobot(x, y, 10, 45, 2, this);
+		items.add(newTriRobot);
+	}
+
+	/**
 	 * Toggles the blackout mode for the arena.
 	 *
 	 * <p>

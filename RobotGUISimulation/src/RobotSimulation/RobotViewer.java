@@ -283,10 +283,16 @@ public class RobotViewer extends Application {
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
+		MenuItem triRobotItem = new MenuItem("Tri Robot");
+		triRobotItem.setOnAction(e -> {
+			arena.addTriRobot();
+			drawWorld();
+			playFadeAnimation(btnAddRobot);
+		});
 
 		// Add all robot-type items to the dropdown
 		btnAddRobot.getItems().addAll(normalRobotItem, whiskerRobotItem, beamRobotItem, lightRobotItem, preyRobotItem,
-				predatorRobotItem);
+				predatorRobotItem, triRobotItem);
 
 		// Add obstacle button
 		SplitMenuButton btnAddObstacle = new SplitMenuButton();
@@ -476,11 +482,12 @@ public class RobotViewer extends Application {
 		Group root = new Group();
 		Canvas canvas = new Canvas(400, 500);
 		root.getChildren().add(canvas);
-
-		double radius = Math.min(400, 500) / 2;
-
-		javafx.scene.shape.Circle clipCircle = new javafx.scene.shape.Circle(200, 250, radius);
-		root.setClip(clipCircle);
+		/*
+		 * double radius = Math.min(400, 500) / 2;
+		 * 
+		 * javafx.scene.shape.Circle clipCircle = new javafx.scene.shape.Circle(200,
+		 * 250, radius); root.setClip(clipCircle);
+		 */
 
 		bp.setLeft(root);
 		mc = new MyCanvas(canvas.getGraphicsContext2D(), 400, 500);
