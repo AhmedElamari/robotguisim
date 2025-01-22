@@ -45,6 +45,8 @@ public class RobotArena {
 
 	/** Indicates whether the arena is in blackout mode. */
 	boolean isBlackOut = false;
+	/** The shape of the arena (rectangle, circle, etc.). */
+	private String arenaShape = "rectangle"; // default is "rectangle"
 
 	/**
 	 * Default constructor that initializes the arena with predefined dimensions.
@@ -75,6 +77,16 @@ public class RobotArena {
 		items.add(new Obstacle(350, 100, 10));
 		items.add(new Obstacle(100, 300, 10));
 
+	}
+
+	/**
+	 * OPTIONAL: let user or config specify the arena shape, e.g. "cirle" or
+	 * "rectangle"
+	 */
+
+	public void setArenaShape(String shape) {
+		arenaShape = shape.toLowerCase().trim();
+		System.out.println("Arena shape set to: " + arenaShape);
 	}
 
 	/**
@@ -311,6 +323,18 @@ public class RobotArena {
 	 */
 	public void drawArena(MyCanvas mc) {
 		mc.setBackgroundColor(isBlackOut ? 'l' : 'w');
+		// Defined the largest circle that fits in xMax, yMax
+		// Center it at xMax/2, yMax/2 and radius = min(xMax, yMax)/2
+		if (arenaShape.equals("circle")) {
+			double centerX = xMax / 2;
+			double centerY = yMax / 2;
+			double radius = Math.min(xMax, yMax) / 2;
+
+			// draw faint outline e.g. 'b' for blue ring
+			mc.setStrokeColour('b');
+			mc.setLineWidth(2);
+			mc.gc.strokeOval(centerX - radius, centerY - radius, radius * 2, radius * 2);
+		}
 		for (ArenaItem i : items) {
 			i.drawItem(mc);
 		}
@@ -457,6 +481,17 @@ public class RobotArena {
 	}
 
 	/**
+	 * Modified to handle "circle" boundary if arenaShape = "circle".
+	 */
+	public double CheckRobotAngle(double x, double y, double rad, double ang, int notID) {
+		if (arenaShape.equals("circle")) {
+			return checkAngleCircleArena(x, y, rad, ang, notID);
+		} else {
+			return checkAngleRectArena(x, y, rad, ang, notID);
+		}
+	}
+
+	/**
 	 * Attempts to compute a new direction angle when a robot collides with a wall
 	 * or another item.
 	 *
@@ -473,7 +508,7 @@ public class RobotArena {
 	 * @param notID the ID of the robot to exclude from collision checks
 	 * @return the new angle that avoids collisions
 	 */
-	public double CheckRobotAngle(double x, double y, double rad, double ang, int notID) {
+	public double checkAngleRectArena(double x, double y, double rad, double ang, int notID) {
 		double ans = ang;
 		double randomOffset;
 		int maxAttempts = 5;
@@ -519,6 +554,71 @@ public class RobotArena {
 			double newY = y + step * Math.sin(radAngle);
 			// Check if the new position is within arena boundaries.
 			if (newX - rad >= 0 && newX + rad <= xMax && newY - rad >= 0 && newY + rad <= yMax) {
+				ans = candidateAngle;
+				break;
+			}
+		}
+		return ans;
+	}
+
+	private double checkAngleCircleArena(double x, double y, double rad, double ang, int notID) {
+		double ans = ang;
+		double randomOffset;
+		int maxAttempts = 5;
+		boolean collisionDetected = false;
+
+		// Check collision with arena boundaries.
+		double centerX = xMax / 2;
+		double centerY = yMax / 2;
+		double arenaRadius = Math.min(xMax, yMax) / 2;
+
+		// check if outside the ciruclar boundary: distance from center + robotRadius >
+		// arenaRadius
+		double dx = x - centerX;
+		double dy = y - centerY;
+		double distFromCenter = Math.sqrt(dx * dx + dy * dy);
+		if (distFromCenter + rad > arenaRadius) {
+			collisionDetected = true;
+		}
+
+		// check collisions with items (same as rectangular appraoch)
+		for (ArenaItem i : items) {
+			if (i instanceof Robot && i.getID() != notID) {
+				Robot ro = (Robot) i;
+				double dist = Math.sqrt(Math.pow(ro.getX() - x, 2) + Math.pow(ro.getY() - y, 2));
+				if (dist < ro.getRad() + rad) {
+					collisionDetected = true;
+					break;
+				}
+			}
+			// Check collision with obstacles.
+			if (i instanceof Obstacle) {
+				double ox = i.getX();
+				double oy = i.getY();
+				double od = Math.sqrt(Math.pow(ox - x, 2) + Math.pow(oy - y, 2));
+				if (od < i.getRad() + rad) {
+					collisionDetected = true;
+					break;
+				}
+			}
+		}
+		if (!collisionDetected) {
+			return ans;
+		}
+
+		// attempt random offset as in rectangular arena
+		for (int attempt = 0; attempt < maxAttempts; attempt++) {
+			randomOffset = (Math.random() * 90) - 45;
+			double candidateAngle = (ang + 180 + randomOffset) % 360;
+			double radAngle = Math.toRadians(candidateAngle);
+			double step = 2.0;
+			double newX = x + step * Math.cos(radAngle);
+			double newY = y + step * Math.sin(radAngle);
+			// Check if the new position is within arena boundaries.
+			dx = newX - centerX;
+			dy = newY - centerY;
+			distFromCenter = Math.sqrt(dx * dx + dy * dy);
+			if (distFromCenter + rad <= arenaRadius) {
 				ans = candidateAngle;
 				break;
 			}

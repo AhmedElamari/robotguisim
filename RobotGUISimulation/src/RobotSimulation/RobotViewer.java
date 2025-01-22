@@ -185,13 +185,19 @@ public class RobotViewer extends Application {
 			drawWorld();
 		});
 
+		MenuItem mShape = new MenuItem("Change to Circle");
+		mShape.setOnAction(e -> {
+			arena.setArenaShape("circle");
+			drawWorld();
+		});
+
 		MenuItem mExit = new MenuItem("Exit");
 		mExit.setOnAction(e -> {
 			timer.stop();
 			System.exit(0);
 		});
 
-		mFile.getItems().addAll(mNew, mSave, mLoad, mExit);
+		mFile.getItems().addAll(mNew, mSave, mLoad, mShape, mExit);
 
 		// Help menu
 		Menu mHelp = new Menu("Help");
@@ -470,6 +476,12 @@ public class RobotViewer extends Application {
 		Group root = new Group();
 		Canvas canvas = new Canvas(400, 500);
 		root.getChildren().add(canvas);
+
+		double radius = Math.min(400, 500) / 2;
+
+		javafx.scene.shape.Circle clipCircle = new javafx.scene.shape.Circle(200, 250, radius);
+		root.setClip(clipCircle);
+
 		bp.setLeft(root);
 		mc = new MyCanvas(canvas.getGraphicsContext2D(), 400, 500);
 		setMouseEvents(canvas);
