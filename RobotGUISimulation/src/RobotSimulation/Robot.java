@@ -255,4 +255,14 @@ public class Robot extends ArenaItem {
 	public String fileString() {
 		return String.format("Robot %.1f %.1f %.1f %c %.1f %.1f", x, y, rad, col, rAngle, rSpeed);
 	}
+
+	public double getSpeed() {
+		// TODO Auto-generated method stub
+		return rSpeed;
+	}
+
+	public void setSpeed(double sqrt) {
+		// TODO Auto-generated method stub
+		rSpeed = sqrt;
+	}
 }
