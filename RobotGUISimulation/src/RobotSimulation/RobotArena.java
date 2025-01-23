@@ -42,6 +42,8 @@ public class RobotArena {
 	protected ArrayList<Whisker> whiskers;
 	/** List of beams in the arena. */
 	protected ArrayList<Beam> beams;
+	/** List of triangular robots in the arena. */
+	protected ArrayList<triRobot> triRobots;
 
 	/** Indicates whether the arena is in blackout mode. */
 	boolean isBlackOut = false;
@@ -66,6 +68,7 @@ public class RobotArena {
 		xMax = xS;
 		yMax = yS;
 		items = new ArrayList<ArenaItem>();
+		triRobots = new ArrayList<>();
 
 		// Add sample items to the arena.
 		// Example initial items include various types of robots, whiskers, lights,
@@ -83,9 +86,35 @@ public class RobotArena {
 	 * OPTIONAL: let user or config specify the arena shape, e.g. "cirle" or
 	 * "rectangle"
 	 */
-
 	public void setArenaShape(String shape) {
-		arenaShape = shape.toLowerCase().trim();
+		shape = shape.toLowerCase().trim();
+
+		// If we are switching FROM something else TO "circle", do the "halving" for
+		// out-of-bounds items:
+		if (!arenaShape.equals("circle") && shape.equals("circle")) {
+			double centerX = xMax / 2.0;
+			double centerY = yMax / 2.0;
+			double arenaRadius = Math.min(xMax, yMax) / 2.0;
+
+			for (ArenaItem item : items) {
+				double dx = item.getX() - centerX;
+				double dy = item.getY() - centerY;
+				double dist = Math.sqrt(dx * dx + dy * dy);
+
+				// If item is outside circle: dist + item.radius > arenaRadius
+				if (dist + item.getRad() > arenaRadius) {
+					// "Halve" its location relative to the center
+					// i.e., move it closer by 50% in one step
+					double newX = item.getX() / 2.0;
+					double newY = item.getY() / 2.0;
+					item.setXY(newX, newY);
+					System.out.println("Moved item " + item + " to (" + newX + ", " + newY + ")");
+				}
+			}
+		}
+
+		// Finally, store the new shape
+		arenaShape = shape;
 		System.out.println("Arena shape set to: " + arenaShape);
 	}
 
@@ -517,6 +546,14 @@ public class RobotArena {
 		// Check collision with arena boundaries.
 		if (x - rad < 0 || x + rad > xMax || y - rad < 0 || y + rad > yMax) {
 			collisionDetected = true;
+		}
+
+		for (triRobot tr : triRobots) {
+			double dist = Math.sqrt(Math.pow(tr.getX() - x, 2) + Math.pow(tr.getY() - y, 2));
+			if (dist < tr.getRad() + rad) {
+				collisionDetected = true;
+				break;
+			}
 		}
 		// Check collision with other robots.
 		for (ArenaItem i : items) {

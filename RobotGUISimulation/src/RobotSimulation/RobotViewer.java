@@ -50,6 +50,8 @@ public class RobotViewer extends Application {
 
 	/** The custom canvas used to render the simulation. */
 	private MyCanvas mc;
+	/** Root group for arena */
+	private Group arenaGroup;
 	/** Timer to drive the animation loop of the simulation. */
 	private AnimationTimer timer;
 	/** Right panel (VBox) for displaying status labels about arena items. */
@@ -188,6 +190,9 @@ public class RobotViewer extends Application {
 		MenuItem mShape = new MenuItem("Change to Circle");
 		mShape.setOnAction(e -> {
 			arena.setArenaShape("circle");
+			double radius = Math.min(arena.getXSize(), arena.getYSize()) / 2;
+			javafx.scene.shape.Circle clipCircle = new javafx.scene.shape.Circle(200, 250, radius);
+			arenaGroup.setClip(clipCircle);
 			drawWorld();
 		});
 
@@ -479,17 +484,11 @@ public class RobotViewer extends Application {
 		bp.setTop(topVBox);
 
 		// ---- Left: Canvas for drawing ----
-		Group root = new Group();
+		arenaGroup = new Group();
 		Canvas canvas = new Canvas(400, 500);
-		root.getChildren().add(canvas);
-		/*
-		 * double radius = Math.min(400, 500) / 2;
-		 * 
-		 * javafx.scene.shape.Circle clipCircle = new javafx.scene.shape.Circle(200,
-		 * 250, radius); root.setClip(clipCircle);
-		 */
+		arenaGroup.getChildren().add(canvas);
+		bp.setLeft(arenaGroup);
 
-		bp.setLeft(root);
 		mc = new MyCanvas(canvas.getGraphicsContext2D(), 400, 500);
 		setMouseEvents(canvas);
 
