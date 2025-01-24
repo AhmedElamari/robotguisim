@@ -277,4 +277,13 @@ public class PredatorRobot extends Beam {
 		return String.format("Predator %.1f %.1f %.1f %c %.1f %.1f %d %d", x, y, rad, col, rAngle, rSpeed, preyEaten,
 				roarCooldown);
 	}
+
+	/**
+	 * Getter for preyEaten
+	 * 
+	 * @param preysEaten
+	 */
+	public void setPreysEaten(int preysEaten) {
+		preyEaten = preysEaten;
+	}
 }
