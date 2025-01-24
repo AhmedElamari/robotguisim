@@ -278,19 +278,19 @@ public class RobotViewer extends Application {
 		});
 		MenuItem preyRobotItem = new MenuItem("Prey Robot");
 		preyRobotItem.setOnAction(e -> {
-			arena.addPrey();
+			arena.addPrey(); // Implemented in @RobotArena
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
 		MenuItem predatorRobotItem = new MenuItem("Predator Robot");
 		predatorRobotItem.setOnAction(e -> {
-			arena.addPredator();
+			arena.addPredator(); // Implemented in @RobotArena
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
 		MenuItem triRobotItem = new MenuItem("Tri Robot");
 		triRobotItem.setOnAction(e -> {
-			arena.addTriRobot();
+			arena.addTriRobot(); // Implemented
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});

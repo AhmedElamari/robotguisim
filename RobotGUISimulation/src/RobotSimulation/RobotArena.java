@@ -18,7 +18,7 @@ import javafx.beans.property.SimpleIntegerProperty;
  * </p>
  *
  * @author Ahmed Elamari
- * @version 1.0
+ * @version 3.0
  */
 public class RobotArena {
 
@@ -89,7 +89,7 @@ public class RobotArena {
 	public void setArenaShape(String shape) {
 		shape = shape.toLowerCase().trim();
 
-		// If we are switching FROM something else TO "circle", do the "halving" for
+		// If switching FROM something else TO "circle", do the "halving" for
 		// out-of-bounds items:
 		if (!arenaShape.equals("circle") && shape.equals("circle")) {
 			double centerX = xMax / 2.0;
@@ -172,6 +172,8 @@ public class RobotArena {
 				}
 			}
 
+			int itemsLoaded = 0; // track how many items we successfully parse
+
 			// Parse remaining lines for individual items.
 			for (int i = 1; i < lines.length; i++) {
 				String line = lines[i].trim();
@@ -186,6 +188,19 @@ public class RobotArena {
 
 				try {
 					switch (parts[0]) {
+
+					// -------------------------
+					// NEW: Score line
+					// Format: "Score <integerValue>"
+					// -------------------------
+					case "Score":
+						if (parts.length >= 2) {
+							int sc = Integer.parseInt(parts[1]);
+							totalScore.set(sc); // sets the arena's current score
+							System.out.println("Set Arena Score to: " + sc);
+						}
+						break;
+
 					case "Robot":
 						if (parts.length >= 7) {
 							double x = Double.parseDouble(parts[1]);
@@ -197,6 +212,7 @@ public class RobotArena {
 							Robot r = new Robot(x, y, rad, angle, speed, this);
 							r.col = col;
 							items.add(r);
+							itemsLoaded++;
 							System.out.println("Added Robot");
 						}
 						break;
@@ -212,13 +228,14 @@ public class RobotArena {
 							Whisker w = new Whisker(x, y, rad, angle, speed, this);
 							w.col = col;
 							items.add(w);
+							itemsLoaded++;
 							System.out.println("Added Whisker");
 						}
 						break;
 
 					case "Beam":
 						if (parts.length >= 8) {
-							String type = parts[1]; // Should be "Robot" or "Light"
+							String type = parts[1]; // "Robot" or "Light"
 							double x = Double.parseDouble(parts[2]);
 							double y = Double.parseDouble(parts[3]);
 							double rad = Double.parseDouble(parts[4]);
@@ -230,11 +247,13 @@ public class RobotArena {
 								BeamLight bl = new BeamLight(x, y, rad, angle, speed, this);
 								bl.col = col;
 								items.add(bl);
+								itemsLoaded++;
 								System.out.println("Added Beam Light");
 							} else if (type.equals("Robot")) {
 								Beam b = new Beam(x, y, rad, angle, speed, this);
 								b.col = col;
 								items.add(b);
+								itemsLoaded++;
 								System.out.println("Added Beam Robot");
 							}
 						}
@@ -249,6 +268,7 @@ public class RobotArena {
 							Light l = new Light(x, y, rad);
 							l.col = col;
 							items.add(l);
+							itemsLoaded++;
 							System.out.println("Added Light");
 						}
 						break;
@@ -262,6 +282,7 @@ public class RobotArena {
 							Obstacle o = new Obstacle(x, y, rad);
 							o.col = col;
 							items.add(o);
+							itemsLoaded++;
 							System.out.println("Added Obstacle");
 						}
 						break;
@@ -277,11 +298,42 @@ public class RobotArena {
 							Prey p = new Prey(x, y, rad, angle, speed, this);
 							p.col = col;
 							items.add(p);
+							itemsLoaded++;
 							System.out.println("Added Prey");
 						}
 						break;
 
+					// --------------------------------------------
+					// UPDATED Predator: parse preysEaten
+					// Format example:
+					// Predator x y rad col angle speed preysEaten
+					// --------------------------------------------
 					case "Predator":
+						if (parts.length >= 8) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+							double angle = Double.parseDouble(parts[5]);
+							double speed = Double.parseDouble(parts[6]);
+							int preysEaten = Integer.parseInt(parts[7]);
+
+							PredatorRobot pr = new PredatorRobot(x, y, rad, angle, speed, this);
+							pr.col = col;
+							// If PredatorRobot has a setter: pr.setPreysEaten(preysEaten);
+							pr.setPreysEaten(preysEaten);
+
+							items.add(pr);
+							itemsLoaded++;
+							System.out.println("Added Predator, preysEaten=" + preysEaten);
+						}
+						break;
+
+					// ------------------------------------------------
+					// triRobot:
+					// triRobot x y rad col angle speed [maybe other fields?]
+					// ------------------------------------------------
+					case "triRobot":
 						if (parts.length >= 7) {
 							double x = Double.parseDouble(parts[1]);
 							double y = Double.parseDouble(parts[2]);
@@ -289,19 +341,61 @@ public class RobotArena {
 							char col = parts[4].charAt(0);
 							double angle = Double.parseDouble(parts[5]);
 							double speed = Double.parseDouble(parts[6]);
-							PredatorRobot pr = new PredatorRobot(x, y, rad, angle, speed, this);
-							pr.col = col;
-							items.add(pr);
-							System.out.println("Added Predator");
+
+							triRobot tr = new triRobot(x, y, rad, angle, speed, this);
+							tr.col = col;
+							items.add(tr);
+							itemsLoaded++;
+							System.out.println("Added triRobot");
 						}
 						break;
-					}
+
+					// ------------------------------------------------
+					// MiniObstacle:
+					// MiniObstacle x y rad col
+					// ------------------------------------------------
+					case "MiniObstacle":
+						if (parts.length >= 5) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+
+							// Suppose your MiniObstacle constructor is (x,y,rad)
+							miniObstacleXP mo = new miniObstacleXP(x, y, rad);
+							mo.col = col;
+							items.add(mo);
+							itemsLoaded++;
+							System.out.println("Added MiniObstacle");
+						}
+						break;
+
+					// ------------------------------------------------
+					// BounceObstacle:
+					// BounceObstacle x y rad col
+					// ------------------------------------------------
+					case "BounceObstacle":
+						if (parts.length >= 5) {
+							double x = Double.parseDouble(parts[1]);
+							double y = Double.parseDouble(parts[2]);
+							double rad = Double.parseDouble(parts[3]);
+							char col = parts[4].charAt(0);
+
+							BounceObstacle bo = new BounceObstacle(x, y, rad);
+							bo.col = col;
+							items.add(bo);
+							itemsLoaded++;
+							System.out.println("Added BounceObstacle");
+						}
+						break;
+
+					} // end switch
 				} catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
 					System.out.println("Error parsing line: " + line);
 					e.printStackTrace();
 				}
 			}
-			System.out.println("Total items loaded: " + items.size());
+			System.out.println("Total items loaded: " + itemsLoaded);
 		}
 	}
 
