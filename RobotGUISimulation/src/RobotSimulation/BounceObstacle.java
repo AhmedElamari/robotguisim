@@ -5,113 +5,131 @@ import java.util.Random;
 import javafx.scene.paint.Color;
 
 /**
- * A specialized Obstacle that: 1) Deflects robots in a random direction upon
- * collision (calculateBounceDirection). 2) Changes its size (radius) each time
- * it's hit. 3) Cycles through different colors on every bounce. 4) Increments a
- * robot's score when it collides (if Robot has addScore(...) support). 5)
- * Tracks consecutive "chain" bounces happening in quick succession, triggering
- * extra effects. 6) Can "break" or deactivate after a certain number of hits
- * (lifecycle).
+ * Represents a specialized obstacle in the robot simulation arena that:
+ * <ul>
+ * <li>Deflects robots in a random direction upon collision.</li>
+ * <li>Changes size and cycles through colors with each collision.</li>
+ * <li>Tracks consecutive chain bounces for additional effects.</li>
+ * <li>Deactivates ("breaks") after a certain number of hits.</li>
+ * </ul>
+ * 
+ * <p>
+ * This obstacle enhances the simulation with dynamic and interactive behaviors,
+ * making it more engaging.
+ * </p>
+ * 
+ * @author Ahmed Elamari
+ * @version 2.0
  */
 public class BounceObstacle extends Obstacle {
 
-	// Array of colors that the obstacle cycles through after each hit
+	/** Array of colors the obstacle cycles through after each collision. */
 	private final Color[] colorCycle = { Color.PURPLE, Color.BLUEVIOLET, Color.MAGENTA, Color.ORCHID, Color.PINK,
 			Color.PLUM, Color.HOTPINK };
+
+	/** Current index of the colorCycle array. */
 	private int colorIndex = 0;
 
-	// Track how many times this obstacle has been collided with
+	/** Tracks the number of times this obstacle has been hit. */
 	private int hitCount = 0;
-	private final int maxHits = 10; // The obstacle "breaks" after 10 hits
 
-	// The obstacle can shrink or grow slightly upon collision
-	private double sizeChangePerHit = -1.0; // Each hit shrinks the radius by 1
+	/** Maximum number of hits before the obstacle breaks. */
+	private final int maxHits = 10;
 
-	// Whether the obstacle is still "active" (not broken)
+	/** Amount by which the radius changes per hit (can shrink or grow). */
+	private double sizeChangePerHit = -1.0;
+
+	/** Flag to indicate whether the obstacle is still active. */
 	private boolean active = true;
 
-	// For randomizing bounce directions
+	/** Random generator for bounce direction and spawn locations. */
 	private Random rand = new Random();
 
-	// For "chain bounces": if multiple collisions occur within a short time,
-	// we can do something special (like spawn a mini-obstacle).
+	/** Tracks the time of the last collision for chain bounce detection. */
 	private long lastCollisionTime = 0;
-	private final long chainThresholdMillis = 1500; // 1.5 seconds for a chain
+
+	/** Time threshold (in milliseconds) for detecting chain collisions. */
+	private final long chainThresholdMillis = 1500;
 
 	/**
-	 * Construct a BounceObstacle with position (ix, iy) and radius ir.
+	 * Constructs a BounceObstacle with the specified position and radius.
+	 * 
+	 * @param ix The x-coordinate of the obstacle.
+	 * @param iy The y-coordinate of the obstacle.
+	 * @param ir The radius of the obstacle.
 	 */
 	public BounceObstacle(double ix, double iy, double ir) {
 		super(ix, iy, ir);
-		// Default fallback character color (for text-based or older MyCanvas usage)
-		col = 'p'; // 'p' stands for purple in ASCII mode, for instance
+		col = 'p'; // Default color for text-based or older rendering methods.
 	}
 
 	/**
-	 * Draw this obstacle on the canvas. If it's "broken"/inactive, you could choose
-	 * not to draw it or draw differently.
+	 * Draws the obstacle on the canvas. Displays differently if the obstacle is
+	 * broken.
+	 * 
+	 * @param mc The canvas used for drawing the obstacle.
 	 */
 	@Override
 	public void drawItem(MyCanvas mc) {
 		if (!active) {
-			// Obstacle is "broken". You could skip drawing or draw a faint outline.
-			mc.showCircle(x, y, rad, 'g'); // Example: draw a grey circle
+			// Draw a grey circle to represent a broken obstacle.
+			mc.showCircle(x, y, rad, 'g');
 			return;
 		}
 
-		// If active, cycle color from colorCycle array
+		// Draw the active obstacle with the current color from the color cycle.
 		Color fxColor = colorCycle[colorIndex];
 		mc.showCircle(x, y, rad, fxColor);
 	}
 
 	/**
-	 * Each animation step, the arena calls checkItem(...) to let this obstacle
-	 * check for collisions with robots and respond accordingly.
+	 * Checks for collisions with robots in the arena and responds accordingly.
+	 * 
+	 * @param arena The arena containing the obstacle and robots.
 	 */
 	@Override
 	public void checkItem(RobotArena arena) {
-		// If it's broken or inactive, skip
 		if (!active) {
+			// Skip processing if the obstacle is broken.
 			return;
 		}
 
-		// Check for collisions with each robot in the arena
-		Robot[] allRobots = arena.getRobots();
-		for (Robot robot : allRobots) {
+		// Check for collisions with each robot in the arena.
+		for (Robot robot : arena.getRobots()) {
 			double dx = robot.getX() - x;
 			double dy = robot.getY() - y;
 			double dist = Math.sqrt(dx * dx + dy * dy);
 
-			// If center-to-center distance < sum of radii => collision
 			if (dist < robot.getRad() + this.rad) {
-				// Handle collision
+				// Handle collision when a robot is within range.
 				handleCollision(arena, robot);
 			}
 		}
 	}
 
 	/**
-	 * Handle collision with a single Robot: - Randomly deflect the robot - Award
-	 * the robot some points - Shrink/grow this obstacle - Cycle color - Check chain
-	 * collisions - "Break" after certain hits
+	 * Handles the collision with a robot, applying random deflection, size change,
+	 * color cycling, chain detection, and breaking behavior.
+	 * 
+	 * @param arena The arena containing the robot and obstacle.
+	 * @param robot The robot colliding with this obstacle.
 	 */
 	private void handleCollision(RobotArena arena, Robot robot) {
-		// 1) Calculate random bounce direction for the robot
+		// Deflect the robot in a random direction.
 		calculateBounceDirection(robot);
 
-		// 3) Shrink or grow the obstacle
+		// Adjust the size of the obstacle.
 		rad += sizeChangePerHit;
-		// Make sure the radius never goes below some small minimum
-		if (rad < 5)
-			rad = 5;
+		if (rad < 5) {
+			rad = 5; // Ensure the radius does not go below a minimum value.
+		}
 
-		// 4) Cycle to next color
+		// Cycle to the next color.
 		cycleColor();
 
-		// 5) Check if this is a "chain" bounce
+		// Check for chain collisions and trigger additional effects if detected.
 		long now = System.currentTimeMillis();
 		if (now - lastCollisionTime < chainThresholdMillis) {
-			// Chain collision triggered! For example, spawn a small Obstacle:
 			System.out.println("Chain collision! Spawning mini-obstacle...");
 			double spawnX = x + rand.nextInt(40) - 20;
 			double spawnY = y + rand.nextInt(40) - 20;
@@ -119,7 +137,7 @@ public class BounceObstacle extends Obstacle {
 		}
 		lastCollisionTime = now;
 
-		// 6) Track hits, check if we exceed maxHits
+		// Increment hit count and check if the obstacle should break.
 		hitCount++;
 		if (hitCount >= maxHits) {
 			breakObstacle(arena);
@@ -127,14 +145,16 @@ public class BounceObstacle extends Obstacle {
 	}
 
 	/**
-	 * "Break" => spawn some mini obstacles, remove self.
+	 * Breaks the obstacle, spawns mini-obstacles, and deactivates itself.
+	 * 
+	 * @param arena The arena where the obstacle resides.
 	 */
 	private void breakObstacle(RobotArena arena) {
 		active = false;
 		System.out.println("BounceObstacle has broken after " + hitCount + " hits!");
 
-		// spawn N mini obstacles that are each "absorbable"
-		int miniCount = 3; // for example
+		// Spawn several mini-obstacles as a result of breaking.
+		int miniCount = 3;
 		for (int i = 0; i < miniCount; i++) {
 			double spawnX = x + rand.nextInt(30) - 15;
 			double spawnY = y + rand.nextInt(30) - 15;
@@ -142,30 +162,22 @@ public class BounceObstacle extends Obstacle {
 			arena.items.add(mini);
 		}
 
-		// optionally remove self from arena to never draw again
-		// or keep it 'broken' visually
-		// here let's just remove it from the main items list
+		// Remove the obstacle from the arena's item list.
 		arena.items.remove(this);
 	}
 
 	/**
-	 * Randomly changes the robot's angle. You can do more sophisticated physics if
-	 * desired.
+	 * Deflects the robot in a random direction by altering its angle.
+	 * 
+	 * @param robot The robot to deflect.
 	 */
 	private void calculateBounceDirection(Robot robot) {
-
-		// New random angle
 		double randomAngle = rand.nextDouble() * 360.0;
-
-		// Simplest approach: just set a brand-new random angle
 		robot.setAngle(randomAngle);
-
-		// Optionally slow or speed up the robot as a side effect:
-		// e.g. robot.setSpeed(robot.getSpeed() * 0.8);
 	}
 
 	/**
-	 * Cycles to the next color in the colorCycle array.
+	 * Cycles to the next color in the color cycle array.
 	 */
 	private void cycleColor() {
 		colorIndex = (colorIndex + 1) % colorCycle.length;
