@@ -267,7 +267,7 @@ public class RobotViewer extends Application {
 		});
 		MenuItem beamRobotItem = new MenuItem("Beam Robot");
 		beamRobotItem.setOnAction(e -> {
-			arena.addBeamLight(); // Implemented in @RobotArena
+			arena.addBeam(); // Implemented in @RobotArena
 			drawWorld();
 			playFadeAnimation(btnAddRobot);
 		});
