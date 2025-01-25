@@ -171,11 +171,12 @@ public class RobotViewer extends Application {
 		MenuItem mNew = new MenuItem("New");
 		mNew.setOnAction(actionEvent -> {
 			arena = new RobotArena(400, 500);
-			// Re-bind since arena changed
+			// First reset the score in the new arena
+			arena.scoreProperty().set(0); // Reset score in the arena
+			// Then bind the properties
 			scoreProperty.unbind();
 			scoreProperty.bind(arena.scoreProperty());
 			drawWorld();
-			scoreProperty.set(0); // Reset the score property
 		});
 
 		MenuItem mSave = new MenuItem("Save");
