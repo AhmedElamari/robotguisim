@@ -308,8 +308,15 @@ public class MyCanvas {
 		gc.fillPolygon(xpoints, ypoints, beamPoints.size());
 	}
 
+	/**
+	 * Draws a circle with a specified radius and color at a given
+	 * 
+	 * @param x
+	 * @param y
+	 * @param rad
+	 * @param fxColor
+	 */
 	public void showCircle(double x, double y, double rad, Color fxColor) {
-		// TODO Auto-generated method stub
 		gc.setFill(fxColor);
 		gc.fillArc(x - rad, y - rad, rad * 2, rad * 2, 0, 360, ArcType.ROUND);
 

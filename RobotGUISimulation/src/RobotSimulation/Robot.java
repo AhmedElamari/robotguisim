@@ -7,7 +7,7 @@ package RobotSimulation;
  * 
  * <p>
  * This class demonstrates the use of inheritance in Java by extending
- * <codeArenaItem</code>, adding movement, collision detection, and drawing
+ * <code>ArenaItem</code>, adding movement, collision detection, and drawing
  * logic specific to the robot.
  * </p>
  * 
@@ -18,7 +18,7 @@ package RobotSimulation;
  * </p>
  * 
  * @author Ahmed Elamari
- * @version 1.0
+ * @version 3.0
  * 
  * @see ArenaItem
  */
@@ -256,13 +256,21 @@ public class Robot extends ArenaItem {
 		return String.format("Robot %.1f %.1f %.1f %c %.1f %.1f", x, y, rad, col, rAngle, rSpeed);
 	}
 
+	/**
+	 * Returns the current speed of the robot.
+	 * 
+	 * @return
+	 */
 	public double getSpeed() {
-		// TODO Auto-generated method stub
 		return rSpeed;
 	}
 
+	/**
+	 * Sets the speed of the robot.
+	 * 
+	 * @param sqrt
+	 */
 	public void setSpeed(double sqrt) {
-		// TODO Auto-generated method stub
 		rSpeed = sqrt;
 	}
 }
