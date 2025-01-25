@@ -156,6 +156,7 @@ public class RobotArena {
 	 */
 	public RobotArena(String savedData) {
 		items = new ArrayList<>();
+		triRobots = new ArrayList<>();
 		String[] lines = savedData.split("\n");
 
 		if (lines.length > 0) {
@@ -329,11 +330,10 @@ public class RobotArena {
 						}
 						break;
 
-					// ------------------------------------------------
-					// triRobot:
-					// triRobot x y rad col angle speed [maybe other fields?]
-					// ------------------------------------------------
 					case "triRobot":
+						// Expected minimum format:
+						// triRobot x y rad col angle speed
+						// Optional extra fields if your triRobot uses them
 						if (parts.length >= 7) {
 							double x = Double.parseDouble(parts[1]);
 							double y = Double.parseDouble(parts[2]);
@@ -342,8 +342,24 @@ public class RobotArena {
 							double angle = Double.parseDouble(parts[5]);
 							double speed = Double.parseDouble(parts[6]);
 
+							// 1) Create the triRobot using your advanced constructor
 							triRobot tr = new triRobot(x, y, rad, angle, speed, this);
-							tr.col = col;
+							tr.col = col; // set color from the char
+
+							// 2) If you have additional fields (like frictionFactor or velocityX),
+							// you can parse them if they exist. For example:
+							// Format example with extra fields:
+							// triRobot x y rad col angle speed frictionFactor velocityX velocityY
+							if (parts.length >= 10) {
+								double frictionFactor = Double.parseDouble(parts[7]);
+								double vx = Double.parseDouble(parts[8]);
+								double vy = Double.parseDouble(parts[9]);
+								// If your triRobot has these setters:
+								tr.setFrictionFactor(frictionFactor);
+								tr.setVelocity(vx, vy);
+							}
+
+							// 3) Finally add triRobot to items
 							items.add(tr);
 							itemsLoaded++;
 							System.out.println("Added triRobot");
