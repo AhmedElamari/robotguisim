@@ -228,42 +228,89 @@ public class triRobot extends Robot {
 	}
 
 	// Getters and setters for advanced physics fields.
-
+	/**
+	 * Get the mass of the robot.
+	 * 
+	 * @return The mass of the robot.
+	 */
 	public double getMass() {
 		return mass;
 	}
 
+	/**
+	 * get the velocity of the robot in the x direction.
+	 * 
+	 * @return The velocity of the robot in the x direction.
+	 */
 	public double getVelocityX() {
 		return velocityX;
 	}
 
+	/**
+	 * get the velocity of the robot in the y direction.
+	 * 
+	 * @return The velocity of the robot in the y direction.
+	 */
 	public double getVelocityY() {
 		return velocityY;
 	}
 
+	/**
+	 * Set the velocity of the robot in the x and y directions.
+	 * 
+	 * @param vx The new velocity in the x direction.
+	 * @param vy The new velocity in the y direction.
+	 */
 	public void setVelocity(double vx, double vy) {
 		this.velocityX = vx;
 		this.velocityY = vy;
 	}
 
+	/**
+	 * Set the wheel speeds for advanced movement control.
+	 * 
+	 * @param front The speed of the front wheel.
+	 * @param left  The speed of the left wheel.
+	 * @param right The speed of the right wheel.
+	 */
 	public void setWheelSpeeds(double front, double left, double right) {
 		this.frontWheelSpeed = front;
 		this.leftWheelSpeed = left;
 		this.rightWheelSpeed = right;
 	}
 
+	/**
+	 * Get the friction factor for velocity loss per frame.
+	 * 
+	 * @return The friction factor.
+	 */
 	public double getFrontWheelSpeed() {
 		return frontWheelSpeed;
 	}
 
+	/**
+	 * Get the speed of the left wheel.
+	 * 
+	 * @return The speed of the left wheel.
+	 */
 	public double getLeftWheelSpeed() {
 		return leftWheelSpeed;
 	}
 
+	/**
+	 * Get the speed of the right wheel.
+	 * 
+	 * @return The speed of the right wheel.
+	 */
 	public double getRightWheelSpeed() {
 		return rightWheelSpeed;
 	}
 
+	/**
+	 * Set the friction factor for velocity loss per frame.
+	 * 
+	 * @param f The new friction factor.
+	 */
 	public void setFrictionFactor(double f) {
 		frictionFactor = f;
 	}

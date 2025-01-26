@@ -104,9 +104,9 @@ public class RobotArena {
 				// If item is outside circle: dist + item.radius > arenaRadius
 				if (dist + item.getRad() > arenaRadius) {
 					// "Halve" its location relative to the center
-					// i.e., move it closer by 50% in one step
-					double newX = item.getX() / 2.0;
-					double newY = item.getY() / 2.0;
+					// i.e., move it halfway towards the center
+					double newX = centerX + (item.getX() - centerX) * 0.5;
+					double newY = centerY + (item.getY() - centerY) * 0.5;
 					item.setXY(newX, newY);
 					System.out.println("Moved item " + item + " to (" + newX + ", " + newY + ")");
 				}
